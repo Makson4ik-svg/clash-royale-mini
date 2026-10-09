@@ -1,0 +1,2315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Clash Royale Mini · Royale Pass</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; font-family: 'Trebuchet MS', 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; min-height: 100vh; min-height: 100dvh; background: #0a0e1a; display: flex; justify-content: center; align-items: center; padding: 0; overflow: hidden; touch-action: manipulation; }
+        .app {
+            background: linear-gradient(180deg, #1a2a4a 0%, #0f1a30 40%, #0a1220 100%);
+            border-radius: 0;
+            box-shadow: none;
+            max-width: 640px; width: 100%; height: 100vh; height: 100dvh; max-height: 100vh; max-height: 100dvh;
+            display: flex; flex-direction: column; overflow: hidden; position: relative;
+        }
+        /* ===== ЭКРАН ВХОДА ===== */
+        .auth-screen {
+            position: fixed; inset: 0; z-index: 500;
+            background: linear-gradient(180deg, #0f1a30 0%, #1a2a4a 40%, #0a1220 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 24px 20px; gap: 16px;
+        }
+        .auth-screen.hidden { display: none; }
+        .auth-logo { font-size: 64px; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.8)); animation: rpIconFloat 3s ease-in-out infinite; }
+        .auth-title { color: #ffd966; font-size: 26px; font-weight: 900; text-shadow: 2px 2px 0 #4a2a08, 0 0 25px rgba(255,215,0,0.5); text-transform: uppercase; letter-spacing: 3px; text-align: center; }
+        .auth-subtitle { color: #8a9ab8; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 8px; }
+        .auth-form { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; }
+        .auth-input {
+            width: 100%; padding: 14px 16px; border-radius: 14px;
+            background: rgba(0,0,0,0.4); border: 2px solid #4a3a1a;
+            color: #f0e6d2; font-size: 15px; font-weight: 700;
+            outline: none; font-family: inherit;
+        }
+        .auth-input:focus { border-color: #ffd966; box-shadow: 0 0 12px rgba(255,215,0,0.4); }
+        .auth-input::placeholder { color: #6a7a9a; }
+        .auth-btn {
+            width: 100%; padding: 14px; border-radius: 50px; font-size: 16px;
+            font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; font-family: inherit; border: 2px solid #ffe68a;
+            background: linear-gradient(180deg, #ffd966, #b87a10); color: #3a1e00;
+            box-shadow: 0 6px 0 #7a4e08; transition: 0.1s;
+        }
+        .auth-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a4e08; }
+        .auth-btn.secondary { background: linear-gradient(180deg, #3a4a6a, #1a2a4a); color: #ffd966; border-color: #6a5a3a; box-shadow: 0 6px 0 #0a1a2a; }
+        .auth-error { color: #e74c3c; font-size: 12px; font-weight: 700; text-align: center; min-height: 16px; }
+        .auth-switch { color: #8a9ab8; font-size: 12px; font-weight: 700; text-align: center; }
+        .auth-switch span { color: #ffd966; cursor: pointer; text-decoration: underline; }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px 8px; flex-shrink: 0; position: relative; z-index: 5;
+            background: linear-gradient(180deg, #2a4a7a 0%, #1a3050 100%);
+            border-bottom: 2px solid #8a6a2a; box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            gap: 6px;
+        }
+        .player-info { display: flex; align-items: center; gap: 6px; }
+        .avatar {
+            width: 32px; height: 32px; background: linear-gradient(180deg, #ffd966, #b8860b);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 16px; border: 2px solid #ffe68a; box-shadow: 0 2px 0 #5a3a08; flex-shrink: 0;
+        }
+        .player-col { display: flex; flex-direction: column; gap: 2px; }
+        .player-name { color: #f0e6d2; font-weight: 900; font-size: 12px; text-shadow: 1px 1px 0 #000; line-height: 1; }
+        .arena-badge {
+            display: flex; align-items: center; gap: 3px;
+            background: linear-gradient(180deg, #3a2a0e, #1a0e04);
+            border-radius: 10px; padding: 1px 6px; border: 1px solid #8a6a2a;
+            font-size: 9px; font-weight: 900; color: #ffd966; letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .trophy-badge {
+            display: flex; align-items: center; gap: 4px;
+            background: linear-gradient(180deg, #3a2a0e, #1a0e04);
+            border-radius: 30px; padding: 3px 12px 3px 8px;
+            border: 2px solid #8a6a2a;
+            box-shadow: inset 0 -2px 0 #0a0604, 0 2px 0 #000;
+        }
+        .trophy-icon { font-size: 14px; filter: drop-shadow(0 1px 2px black); }
+        .trophy-value { color: #ffd966; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 0 #000; }
+
+        .content { flex: 1; overflow-y: auto; padding: 12px; position: relative; z-index: 2; -webkit-overflow-scrolling: touch; }
+        .content::-webkit-scrollbar { width: 6px; }
+        .content::-webkit-scrollbar-thumb { background: #8a6a2a; border-radius: 3px; }
+        .tab-page { display: none; }
+        .tab-page.active { display: block; }
+
+        .page-title {
+            text-align: center; font-size: 22px; font-weight: 900; letter-spacing: 2px;
+            color: #ffd966; text-shadow: 2px 2px 0 #4a2a08, 0 0 15px rgba(255,215,0,0.3);
+            margin: 4px 0 14px; text-transform: uppercase;
+        }
+        .section {
+            background: linear-gradient(180deg, #1e3460 0%, #142444 100%);
+            border-radius: 14px; padding: 12px; margin-bottom: 12px;
+            border: 2px solid #6a5a3a;
+            box-shadow: inset 0 2px 4px rgba(255,215,0,0.08), inset 0 -3px 0 rgba(0,0,0,0.4), 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 4px; }
+        .section-title { color: #ffd966; font-weight: 900; font-size: 13px; letter-spacing: 1.5px; text-shadow: 1px 1px 0 #000; text-transform: uppercase; }
+        .deck-counter {
+            background: linear-gradient(180deg, #3a2a0e, #1a0e04); color: #ffd966;
+            font-weight: 900; font-size: 11px; padding: 3px 10px; border-radius: 20px;
+            border: 1px solid #8a6a2a;
+        }
+        .deck-counter.full { background: linear-gradient(180deg, #1a5a1a, #0a3a0a); border-color: #4adf4a; color: #a8ffa8; }
+
+        .rp-card {
+            display: flex; align-items: center; gap: 12px;
+            background: linear-gradient(135deg, #4a2a7a 0%, #2a1a5a 50%, #1a0e30 100%);
+            border-radius: 14px; padding: 12px 14px;
+            border: 3px solid #ffd966;
+            box-shadow: 0 0 20px rgba(255,215,0,0.4), inset 0 3px 6px rgba(255,215,0,0.15), inset 0 -3px 0 rgba(0,0,0,0.4);
+            cursor: pointer; transition: 0.15s; position: relative; overflow: hidden;
+        }
+        .rp-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 12px, rgba(255,215,0,0.06) 12px, rgba(255,215,0,0.06) 24px);
+            pointer-events: none;
+        }
+        .rp-card:active { transform: scale(0.98); }
+        .rp-icon {
+            font-size: 48px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.7));
+            position: relative; z-index: 1;
+            animation: rpIconFloat 3s ease-in-out infinite;
+        }
+        @keyframes rpIconFloat {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-4px) rotate(3deg); }
+        }
+        .rp-info { flex: 1; position: relative; z-index: 1; }
+        .rp-level {
+            color: #ffd966; font-size: 15px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 1px; text-shadow: 2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.5);
+            margin-bottom: 6px;
+        }
+        .rp-progress-track {
+            height: 12px; background: #0a0618; border-radius: 15px; overflow: hidden;
+            border: 2px solid #8a6a2a; margin-bottom: 4px;
+            box-shadow: inset 0 2px 4px black;
+        }
+        .rp-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d84ff0, #ffd966, #ffd966);
+            background-size: 200% 100%; transition: width 0.3s;
+            box-shadow: 0 0 10px #ffd966;
+            animation: rpShine 2s linear infinite;
+        }
+        @keyframes rpShine { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+        .rp-progress-text { color: #ffe68a; font-size: 11px; font-weight: 900; text-shadow: 1px 1px 0 #000; }
+        .rp-arrow { font-size: 32px; color: #ffd966; font-weight: 900; filter: drop-shadow(0 2px 3px black); position: relative; z-index: 1; }
+        .rp-badge-new {
+            position: absolute; top: -4px; right: -4px;
+            background: linear-gradient(180deg, #ff4a4a, #a02020);
+            color: #fff; font-size: 10px; font-weight: 900;
+            padding: 2px 8px; border-radius: 12px;
+            border: 2px solid #ff9b9b; box-shadow: 0 2px 0 #5a0a0a;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+            animation: badgePulse 1.5s infinite; z-index: 2;
+        }
+        @keyframes badgePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        .chest-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
+        .chest-slot {
+            aspect-ratio: 0.85;
+            background: linear-gradient(180deg, #142444 0%, #0a1220 100%);
+            border-radius: 12px; border: 2px dashed #3a4a6a;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.15s; padding: 6px 4px;
+            position: relative; box-shadow: inset 0 2px 6px rgba(0,0,0,0.6); gap: 4px;
+        }
+        .chest-slot.filled {
+            border: 2px solid #ffd966;
+            background: linear-gradient(180deg, #3a2a0e 0%, #1a0e04 100%);
+            box-shadow: 0 3px 0 #5a3a08, 0 5px 10px rgba(0,0,0,0.6), 0 0 15px rgba(255,215,0,0.4);
+            animation: chestFloat 2.5s ease-in-out infinite;
+        }
+        @keyframes chestFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .chest-slot.filled:active { transform: translateY(2px); box-shadow: 0 1px 0 #5a3a08; }
+        .chest-slot .chest-emoji { font-size: 30px; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.5)); line-height: 1; }
+        .chest-slot.empty .chest-emoji { filter: grayscale(1) brightness(0.4); }
+        .chest-slot .chest-label { font-size: 9px; font-weight: 900; text-transform: uppercase; color: #ffd966; text-shadow: 1px 1px 0 #000; text-align: center; line-height: 1.1; }
+        .chest-slot.empty .chest-label { color: #4a5a7a; }
+        .chest-slot .chest-badge {
+            position: absolute; top: 4px; right: 4px; background: #e74c3c; color: #fff;
+            font-weight: 900; font-size: 9px; padding: 1px 6px; border-radius: 10px;
+            border: 1px solid #ff9b9b; animation: badgePulse 1.5s infinite;
+        }
+
+        .arena-center-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 0 4px; }
+        .arena-center {
+            position: relative; width: 130px; height: 130px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, rgba(255,215,0,0) 70%);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .arena-center:active { transform: scale(0.95); }
+        .arena-center::before {
+            content: ''; position: absolute; inset: 8px; border-radius: 50%;
+            background: linear-gradient(180deg, #2a4a7a 0%, #1a3050 100%);
+            border: 3px solid #ffd966;
+            box-shadow: 0 0 25px rgba(255,215,0,0.6), inset 0 4px 12px rgba(0,0,0,0.6), inset 0 -3px 0 rgba(0,0,0,0.4);
+            z-index: 0;
+        }
+        .arena-center::after {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            border: 2px dashed rgba(255,215,0,0.4);
+            animation: arenaRotate 12s linear infinite; z-index: 1;
+        }
+        @keyframes arenaRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .arena-center-emoji {
+            font-size: 62px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.7));
+            z-index: 2; position: relative; animation: arenaFloat 3s ease-in-out infinite;
+        }
+        @keyframes arenaFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .arena-center-name {
+            color: #ffd966; font-size: 15px; font-weight: 900; text-transform: uppercase;
+            letter-spacing: 1px; margin-top: 10px;
+            text-shadow: 2px 2px 0 #000, 0 0 15px rgba(255,215,0,0.5); text-align: center;
+        }
+        .arena-center-trophies {
+            display: flex; align-items: center; gap: 6px;
+            background: linear-gradient(180deg, #3a2a0e, #1a0e04);
+            border-radius: 30px; padding: 4px 14px; margin-top: 6px;
+            border: 2px solid #8a6a2a;
+            box-shadow: inset 0 -2px 0 #0a0604, 0 3px 0 #000;
+        }
+        .arena-center-trophies .icon { font-size: 16px; filter: drop-shadow(0 2px 3px black); }
+        .arena-center-trophies .value { color: #ffd966; font-weight: 900; font-size: 16px; text-shadow: 1px 1px 0 #000; }
+        .arena-path-hint {
+            color: #8a9ab8; font-size: 10px; font-weight: 700; margin-top: 6px;
+            letter-spacing: 0.5px; text-align: center;
+            animation: hintPulse 2s ease-in-out infinite;
+        }
+        @keyframes hintPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+        .deck-selector { display: flex; gap: 5px; margin-bottom: 12px; padding: 4px; background: linear-gradient(180deg, #0f1a30, #0a1220); border-radius: 12px; border: 2px solid #4a3a1a; }
+        .deck-tab {
+            flex: 1; background: linear-gradient(180deg, #1a2a4a 0%, #0f1a30 100%);
+            border: 2px solid #3a4a6a; border-radius: 8px; padding: 6px 4px;
+            cursor: pointer; transition: 0.15s; display: flex; flex-direction: column;
+            align-items: center; gap: 2px; position: relative; color: #6a7a9a; font-family: inherit;
+        }
+        .deck-tab .deck-num { font-size: 15px; font-weight: 900; color: #6a7a9a; line-height: 1; }
+        .deck-tab .deck-name { font-size: 8px; font-weight: 900; text-transform: uppercase; color: #4a5a7a; line-height: 1; }
+        .deck-tab.active {
+            background: linear-gradient(180deg, #ffd966 0%, #e8a820 50%, #b87a10 100%);
+            border-color: #ffe68a;
+            box-shadow: 0 3px 0 #7a4e08, 0 0 10px rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+        .deck-tab.active .deck-num, .deck-tab.active .deck-name { color: #3a1e00; }
+        .deck-tab .deck-status { position: absolute; top: 2px; right: 3px; font-size: 8px; font-weight: 900; padding: 0px 4px; border-radius: 5px; background: rgba(0,0,0,0.5); color: #4adf4a; }
+        .deck-tab .deck-status.incomplete { color: #e74c3c; }
+
+        .deck-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .deck-slot {
+            aspect-ratio: 0.8; background: linear-gradient(180deg, #1a2a4a 0%, #0f1a30 100%);
+            border-radius: 10px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; cursor: pointer; transition: 0.15s; color: #4a5a7a;
+            font-size: 10px; text-align: center; position: relative;
+            border: 2px solid #2a3a5a; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+            padding: 4px;
+        }
+        .deck-slot.filled {
+            background: linear-gradient(180deg, #f5e7d3 0%, #dfc8a8 50%, #c9a878 100%);
+            border: 2px solid #ffd966;
+            box-shadow: 0 3px 0 #7a5e3e, 0 5px 8px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.5);
+        }
+        .deck-slot.filled:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a5e3e; }
+        .deck-slot .slot-emoji { width: 42px; height: 42px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4)); }
+        .deck-slot .slot-name { font-size: 8px; font-weight: 900; line-height: 1.05; padding: 0 2px; margin-top: 2px; color: #2b1e0e; text-transform: uppercase; }
+        .deck-slot .slot-cost { position: absolute; bottom: 3px; background: linear-gradient(180deg, #5a3a8a, #3a205a); color: #ffe68a; padding: 1px 6px; border-radius: 8px; font-size: 9px; font-weight: 900; border: 1px solid #b88a44; }
+        .slot-level { position: absolute; top: 3px; left: 3px; background: linear-gradient(180deg, #ffd966, #b8860b); color: #3a1e00; font-weight: 900; font-size: 9px; padding: 1px 5px; border-radius: 8px; border: 1px solid #ffe68a; z-index: 2; }
+
+        .deck-actions { display: flex; gap: 6px; margin-top: 10px; }
+        .deck-action-btn {
+            flex: 1; background: linear-gradient(180deg, #3a2a0e, #1a0e04);
+            border: 1px solid #8a6a2a; color: #ffd966; font-weight: 900;
+            padding: 8px 6px; border-radius: 20px; font-size: 11px; cursor: pointer;
+            text-transform: uppercase; text-shadow: 1px 1px 0 #000;
+            box-shadow: 0 3px 0 #0a0604, inset 0 2px 0 rgba(255,215,0,0.15); font-family: inherit;
+        }
+        .deck-action-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #0a0604; }
+        .deck-action-btn.clear { background: linear-gradient(180deg, #5a1a1a, #2a0a0a); border-color: #e74c3c; color: #ff9b9b; }
+
+        .card-pool { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .pool-card {
+            aspect-ratio: 0.8; background: linear-gradient(180deg, #f5e7d3 0%, #dfc8a8 50%, #c9a878 100%);
+            border-radius: 8px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; cursor: pointer; transition: 0.1s; color: #2b1e0e;
+            font-size: 8px; text-align: center; padding: 2px; border: 2px solid #b88a44;
+            box-shadow: 0 3px 0 #7a5e3e, 0 4px 6px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.5);
+            position: relative;
+        }
+        .pool-card:active { transform: translateY(2px); box-shadow: 0 1px 0 #7a5e3e; }
+        .pool-card.in-deck { border: 2px solid #4adf4a; box-shadow: 0 3px 0 #2a9a2a, 0 0 10px rgba(74,223,74,0.5); }
+        .pool-card .pool-emoji { width: 34px; height: 34px; object-fit: contain; }
+        .pool-card .pool-name { font-size: 7px; font-weight: 900; line-height: 1.05; margin-top: 1px; text-transform: uppercase; }
+        .pool-card .pool-cost { background: linear-gradient(180deg, #5a3a8a, #3a205a); color: #ffe68a; padding: 1px 5px; border-radius: 15px; font-size: 9px; font-weight: 900; margin-top: 2px; border: 1px solid #b88a44; }
+        .pool-level { position: absolute; top: 2px; left: 2px; background: linear-gradient(180deg, #ffd966, #b8860b); color: #3a1e00; font-weight: 900; font-size: 8px; padding: 1px 4px; border-radius: 6px; z-index: 2; }
+        .in-deck-mark { position: absolute; bottom: 2px; right: 2px; background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff; font-weight: 900; font-size: 9px; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #a8ffa8; }
+        .rarity-dot { position: absolute; top: 2px; right: 2px; width: 7px; height: 7px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.4); z-index: 2; }
+        .rarity-common { background: #b0b0b0; }
+        .rarity-rare { background: #ff9b3d; }
+        .rarity-epic { background: #b44cff; }
+        .rarity-legendary { background: linear-gradient(135deg, #ffd700, #ff8c00); }
+        .rarity-champion { background: linear-gradient(135deg, #00d4ff, #ff00ff); }
+
+        .btn-battle {
+            border: none; width: 100%; padding: 14px; border-radius: 50px; font-size: 18px;
+            cursor: pointer; transition: 0.05s; display: flex; align-items: center;
+            justify-content: center; gap: 10px; letter-spacing: 2px; text-transform: uppercase;
+            background: linear-gradient(180deg, #ffd966 0%, #e8a820 50%, #b87a10 100%);
+            color: #3a1e00; font-weight: 900;
+            box-shadow: 0 6px 0 #7a4e08, 0 8px 16px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.5), 0 0 25px rgba(255,215,0,0.4);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4); border: 2px solid #ffe68a;
+            margin-top: 6px; font-family: inherit;
+        }
+        .btn-battle:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a4e08; }
+        .btn-battle:disabled { background: linear-gradient(180deg, #3a4a5a, #1a2a3a); color: #6a7a8a; cursor: not-allowed; transform: none; box-shadow: 0 6px 0 #0a1a2a; border-color: #4a5a6a; }
+
+        .shop-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            background: linear-gradient(180deg, #1e3460, #142444); border-radius: 12px;
+            margin-bottom: 10px; border: 2px solid #4a3a1a;
+        }
+        .shop-icon { font-size: 36px; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.5)); flex-shrink: 0; }
+        .shop-info { flex: 1; }
+        .shop-name { color: #ffd966; font-weight: 900; font-size: 14px; text-shadow: 1px 1px 0 #000; text-transform: uppercase; margin-bottom: 3px; }
+        .shop-desc { color: #8a9ab8; font-size: 11px; font-weight: 600; }
+        .shop-price { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
+        .shop-cost { background: linear-gradient(180deg, #3a2a0e, #1a0e04); color: #ffd966; font-weight: 900; padding: 5px 10px; border-radius: 15px; border: 2px solid #8a6a2a; font-size: 12px; }
+        .shop-buy { background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff; font-weight: 900; padding: 5px 12px; border-radius: 15px; border: 2px solid #a8ffa8; font-size: 11px; cursor: pointer; text-transform: uppercase; font-family: inherit; box-shadow: 0 3px 0 #1a5a1a; }
+        .shop-buy:active { transform: translateY(3px); box-shadow: 0 0 0 #1a5a1a; }
+
+        .clan-card { background: linear-gradient(180deg, #1e3460, #142444); border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 2px solid #4a3a1a; text-align: center; }
+        .clan-emblem { font-size: 56px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.6)); margin-bottom: 8px; }
+        .clan-name { color: #ffd966; font-size: 18px; font-weight: 900; text-shadow: 2px 2px 0 #000; text-transform: uppercase; margin-bottom: 4px; }
+        .clan-tag { color: #8a9ab8; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+        .clan-stats { display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255,215,0,0.15); border-bottom: 1px solid rgba(255,215,0,0.15); }
+        .clan-stat { display: flex; flex-direction: column; align-items: center; }
+        .clan-stat-value { color: #ffd966; font-weight: 900; font-size: 16px; }
+        .clan-stat-label { color: #8a9ab8; font-size: 9px; font-weight: 700; text-transform: uppercase; margin-top: 2px; }
+
+        .bottom-nav {
+            display: flex; background: linear-gradient(180deg, #1a2a4a 0%, #0f1a30 100%);
+            border-top: 3px solid #8a6a2a; box-shadow: 0 -4px 12px rgba(0,0,0,0.6);
+            flex-shrink: 0; position: relative; z-index: 10;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .nav-btn {
+            flex: 1; background: transparent; border: none; color: #6a7a9a;
+            font-size: 9px; font-weight: 900; text-transform: uppercase;
+            padding: 8px 4px 10px; cursor: pointer; transition: 0.15s;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            position: relative; font-family: inherit;
+        }
+        .nav-btn .nav-icon { font-size: 20px; filter: grayscale(1) brightness(0.5); transition: 0.15s; }
+        .nav-btn .nav-label { font-size: 9px; font-weight: 900; text-shadow: 1px 1px 0 #000; }
+        .nav-btn.active { color: #ffd966; }
+        .nav-btn.active .nav-icon { filter: grayscale(0) brightness(1.2) drop-shadow(0 0 8px rgba(255,215,0,0.8)); transform: scale(1.1); }
+        .nav-btn.active .nav-label { color: #ffd966; }
+        .nav-btn.active::before { content: ''; position: absolute; top: 0; left: 25%; right: 25%; height: 3px; background: linear-gradient(90deg, transparent, #ffd966, transparent); }
+
+        .game-header { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 8px; gap: 6px; }
+        .enemy-elixir-bar { display: flex; align-items: center; gap: 5px; background: linear-gradient(180deg, #2a0a3a, #1a0525); padding: 3px 8px; border-radius: 15px; border: 1px solid #8a2a5a; }
+        .enemy-elixir-icon { font-size: 12px; }
+        .enemy-elixir-track { width: 55px; height: 8px; background: #1a0e30; border-radius: 15px; overflow: hidden; }
+        .enemy-elixir-fill { height: 100%; background: linear-gradient(90deg, #ff4a8a, #d84ff0); transition: width 0.2s; }
+        .enemy-elixir-text { color: #ff8ab3; font-size: 10px; font-weight: 900; min-width: 20px; text-align: center; }
+        canvas {
+            display: block; width: 100%; height: auto; background: #4a7a4a;
+            border-radius: 12px;
+            box-shadow: inset 0 0 0 3px #2e4a2e, 0 0 0 2px #8a6a2a, 0 8px 20px rgba(0,0,0,0.7);
+            cursor: pointer; touch-action: none; margin: 4px 0;
+            max-width: 100%;
+        }
+        .controls { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px 4px; gap: 6px; }
+        .card-panel {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;
+            background: linear-gradient(180deg, #0f1a30, #0a1220);
+            padding: 8px; border-radius: 14px; border: 2px solid #4a3a1a; flex: 1;
+        }
+        .card {
+            background: linear-gradient(180deg, #f5e7d3 0%, #dfc8a8 50%, #c9a878 100%);
+            aspect-ratio: 0.85; border-radius: 8px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            box-shadow: 0 3px 0 #7a5e3e, 0 4px 6px rgba(0,0,0,0.5);
+            font-weight: 900; color: #2b1e0e; transition: 0.05s;
+            border: 2px solid #b88a44; cursor: pointer; font-size: 10px; padding: 2px;
+            position: relative;
+        }
+        .card.selected { box-shadow: 0 0 0 3px #ffd966, 0 3px 0 #7a5e3e, 0 0 15px rgba(255,215,0,0.7); transform: scale(1.05); }
+        .card .emoji { width: 32px; height: 32px; object-fit: contain; }
+        .card .name { font-size: 7px; margin-top: 1px; text-transform: uppercase; }
+        .card .cost { position: absolute; bottom: 2px; background: linear-gradient(180deg, #5a3a8a, #3a205a); color: #ffe68a; padding: 0px 5px; border-radius: 15px; font-size: 10px; font-weight: 900; border: 1px solid #b88a44; }
+        .card .lvl { position: absolute; top: 2px; left: 2px; background: linear-gradient(180deg, #ffd966, #b8860b); color: #3a1e00; font-weight: 900; font-size: 8px; padding: 0px 4px; border-radius: 6px; z-index: 2; }
+        .card.disabled { filter: grayscale(0.5) brightness(0.7); opacity: 0.7; }
+        .elixir-container { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .elixir-bar { width: 65px; height: 18px; background: #1a0e30; border-radius: 25px; overflow: hidden; border: 2px solid #8a6a2a; }
+        .elixir-fill { width: 100%; height: 100%; background: linear-gradient(90deg, #d84ff0, #a020c0, #d84ff0); background-size: 200% 100%; transition: width 0.2s; animation: elixirShine 2s linear infinite; }
+        @keyframes elixirShine { 0% { background-position: 0% 0; } 100% { background-position: 200% 0; } }
+        .elixir-text { color: #e8b3ff; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 0 black; }
+        .btn-small { background: linear-gradient(180deg, #3a2a0e, #1a0e04); border: 1px solid #8a6a2a; color: #ffd966; font-weight: 900; padding: 6px 10px; border-radius: 30px; font-size: 13px; cursor: pointer; font-family: inherit; box-shadow: 0 3px 0 #0a0604; }
+        .btn-small:active { transform: translateY(3px); box-shadow: 0 0 0 #0a0604; }
+        .next-card-indicator { display: flex; flex-direction: column; align-items: center; background: linear-gradient(180deg, #0f1a30, #0a1220); padding: 5px 7px; border-radius: 10px; border: 2px solid #4a3a1a; min-width: 40px; }
+        .next-label { color: #ffd966; font-size: 7px; font-weight: 900; text-transform: uppercase; }
+        .next-card { background: linear-gradient(180deg, #f5e7d3, #c9a878); width: 30px; height: 38px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid #b88a44; position: relative; }
+        .next-card .emoji { width: 20px; height: 20px; object-fit: contain; }
+        .next-card .cost { position: absolute; bottom: 1px; background: linear-gradient(180deg, #5a3a8a, #3a205a); color: #ffe68a; padding: 0px 4px; border-radius: 8px; font-size: 8px; font-weight: 900; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 300; padding: 16px; }
+        .modal-overlay.active { display: flex; }
+        .upgrade-modal {
+            background: linear-gradient(180deg, #1e3460 0%, #142444 100%);
+            border-radius: 20px; padding: 20px;
+            border: 3px solid #8a6a2a;
+            box-shadow: 0 0 0 3px #4a3a1a, 0 25px 50px rgba(0,0,0,0.9);
+            max-width: 400px; width: 100%; text-align: center;
+            animation: modalIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-height: calc(100vh - 32px); overflow-y: auto;
+        }
+        @keyframes modalIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-card-emoji { width: 100px; height: 100px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); margin: 0 auto 4px; display: block; }
+        .modal-card-name { color: #ffd966; font-size: 20px; font-weight: 900; text-shadow: 2px 2px 0 #000; text-transform: uppercase; margin-bottom: 4px; }
+        .modal-card-rarity { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+        .rarity-label-common { color: #b0b0b0; }
+        .rarity-label-rare { color: #ff9b3d; }
+        .rarity-label-epic { color: #b44cff; }
+        .rarity-label-legendary { color: #ffd700; }
+        .rarity-label-champion { color: #00d4ff; }
+        .in-deck-badge { display: inline-block; background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff; font-weight: 900; font-size: 10px; padding: 3px 12px; border-radius: 15px; border: 2px solid #a8ffa8; margin-bottom: 12px; }
+        .level-progress { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; }
+        .level-badge-big { background: linear-gradient(180deg, #ffd966, #b8860b); color: #3a1e00; font-weight: 900; font-size: 20px; padding: 5px 14px; border-radius: 12px; border: 2px solid #ffe68a; }
+        .arrow { color: #ffd966; font-size: 22px; font-weight: 900; }
+        .level-badge-big.next { background: linear-gradient(180deg, #4adf4a, #2a9a2a); border-color: #a8ffa8; color: #fff; }
+        .stats-block { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; margin-bottom: 12px; border: 1px solid rgba(255,215,0,0.15); }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 4px; font-size: 12px; }
+        .stat-row-label { color: #8a9ab8; font-weight: 700; }
+        .stat-row-values { display: flex; gap: 6px; align-items: center; }
+        .stat-old { color: #e74c3c; font-weight: 900; }
+        .stat-arrow { color: #8a9ab8; }
+        .stat-new { color: #4adf4a; font-weight: 900; }
+        .requirements { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; margin-bottom: 14px; border: 1px solid rgba(255,215,0,0.15); }
+        .req-row { display: flex; justify-content: space-between; padding: 5px 4px; }
+        .req-label { color: #8a9ab8; font-weight: 700; font-size: 12px; }
+        .req-value { font-weight: 900; font-size: 13px; }
+        .req-value.enough { color: #4adf4a; }
+        .req-value.not-enough { color: #e74c3c; }
+        .modal-buttons { display: flex; gap: 8px; }
+        .modal-btn { flex: 1; border: none; padding: 12px 6px; border-radius: 40px; font-size: 12px; font-weight: 900; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+        .modal-btn:active:not(:disabled) { transform: translateY(3px); }
+        .modal-btn-cancel { background: linear-gradient(180deg, #5a3a1a, #2a1a0a); color: #ffddaa; border: 1px solid #8a6a2a; flex: 0.7; }
+        .modal-btn-use { background: linear-gradient(180deg, #4ab0df, #2a7a9a); color: #fff; border: 2px solid #a8e0ff; }
+        .modal-btn-use.in-deck { background: linear-gradient(180deg, #df8a3a, #9a5a1a); border-color: #ffb87b; }
+        .modal-btn-use:disabled { background: linear-gradient(180deg, #3a4a5a, #1a2a3a); color: #6a7a8a; cursor: not-allowed; border-color: #4a5a6a; }
+        .modal-btn-upgrade { background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff; border: 2px solid #a8ffa8; }
+        .modal-btn-upgrade:disabled { background: linear-gradient(180deg, #3a4a5a, #1a2a3a); color: #6a7a8a; cursor: not-allowed; border-color: #4a5a6a; }
+        .modal-btn-upgrade.max { background: linear-gradient(180deg, #ffd966, #b8860b); color: #3a1e00; border-color: #ffe68a; }
+
+        .rp-modal {
+            background: linear-gradient(180deg, #1a2a4a 0%, #0f1a30 100%);
+            border-radius: 20px; border: 3px solid #8a6a2a;
+            box-shadow: 0 0 0 3px #4a3a1a, 0 25px 50px rgba(0,0,0,0.9);
+            max-width: 500px; width: 100%;
+            max-height: calc(100vh - 32px);
+            display: flex; flex-direction: column;
+            padding: 16px 12px 12px;
+            animation: modalIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .rp-modal-title { text-align: center; font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #ffd966; text-shadow: 2px 2px 0 #4a2a08, 0 0 20px rgba(255,215,0,0.5); text-transform: uppercase; margin-bottom: 4px; }
+        .rp-modal-subtitle { text-align: center; color: #ffe68a; font-size: 12px; font-weight: 900; text-shadow: 1px 1px 0 #000; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .rp-list { flex: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 6px; }
+        .rp-list::-webkit-scrollbar { width: 6px; }
+        .rp-list::-webkit-scrollbar-thumb { background: #8a6a2a; border-radius: 3px; }
+        .rp-level-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: linear-gradient(180deg, #142444, #0a1220); border-radius: 12px; border: 2px solid #3a4a6a; position: relative; }
+        .rp-level-item.reached { border-color: #ffd966; box-shadow: 0 0 10px rgba(255,215,0,0.25); }
+        .rp-level-item.claimed { opacity: 0.6; border-color: #4adf4a; }
+        .rp-level-item.future { opacity: 0.55; filter: grayscale(0.4); }
+        .rp-level-num { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(180deg, #3a2a0e, #1a0e04); border: 2px solid #8a6a2a; color: #ffd966; font-size: 16px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; text-shadow: 1px 1px 0 #000; }
+        .rp-level-item.reached .rp-level-num { background: linear-gradient(180deg, #ffd966, #b8860b); color: #3a1e00; border-color: #ffe68a; box-shadow: 0 0 10px rgba(255,215,0,0.6); }
+        .rp-level-item.claimed .rp-level-num { background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff; border-color: #a8ffa8; }
+        .rp-reward-icon { font-size: 28px; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.6)); flex-shrink: 0; }
+        .rp-reward-info { flex: 1; }
+        .rp-reward-label { color: #ffe68a; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 0 #000; }
+        .rp-reward-type { color: #8a9ab8; font-size: 9px; font-weight: 700; margin-top: 2px; }
+        .rp-claim-btn { background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff; font-weight: 900; font-size: 10px; padding: 6px 12px; border-radius: 20px; border: 2px solid #a8ffa8; cursor: pointer; text-transform: uppercase; font-family: inherit; box-shadow: 0 3px 0 #1a5a1a; text-shadow: 1px 1px 0 rgba(0,0,0,0.4); flex-shrink: 0; animation: badgePulse 1.5s infinite; }
+        .rp-claim-btn:active { transform: translateY(3px); box-shadow: 0 0 0 #1a5a1a; }
+        .rp-status-icon { font-size: 22px; flex-shrink: 0; filter: drop-shadow(0 2px 3px black); }
+        .rp-close-btn { display: block; margin: 12px auto 0; width: 60%; padding: 12px; border-radius: 40px; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; background: linear-gradient(180deg, #ffd966, #b87a10); color: #3a1e00; border: 2px solid #ffe68a; box-shadow: 0 5px 0 #7a4e08; font-family: inherit; flex-shrink: 0; }
+        .rp-close-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a4e08; }
+
+        .glory-modal { background: linear-gradient(180deg, #1a2a4a 0%, #0f1a30 100%); border-radius: 20px; border: 3px solid #8a6a2a; box-shadow: 0 0 0 3px #4a3a1a, 0 25px 50px rgba(0,0,0,0.9); max-width: 500px; width: 100%; max-height: calc(100vh - 32px); overflow-y: auto; padding: 20px 14px 20px; animation: modalIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .glory-modal::-webkit-scrollbar { width: 6px; }
+        .glory-modal::-webkit-scrollbar-thumb { background: #8a6a2a; border-radius: 3px; }
+        .glory-title { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: 3px; color: #ffd966; text-shadow: 2px 2px 0 #4a2a08, 0 0 20px rgba(255,215,0,0.5); text-transform: uppercase; margin-bottom: 6px; }
+        .glory-subtitle { text-align: center; color: #8a9ab8; font-size: 11px; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.5px; }
+        .glory-close-btn { display: block; margin: 16px auto 0; width: 60%; padding: 12px; border-radius: 40px; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; background: linear-gradient(180deg, #ffd966, #b87a10); color: #3a1e00; border: 2px solid #ffe68a; box-shadow: 0 5px 0 #7a4e08; font-family: inherit; }
+        .glory-close-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #7a4e08; }
+        .glory-path { display: flex; flex-direction: column; gap: 6px; position: relative; padding: 4px 0; }
+        .glory-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: linear-gradient(180deg, #142444, #0a1220); border-radius: 12px; border: 2px solid #3a4a6a; transition: 0.15s; position: relative; }
+        .glory-item.unlocked { border-color: #ffd966; box-shadow: 0 0 12px rgba(255,215,0,0.3); }
+        .glory-item.current { border-color: #4adf4a; background: linear-gradient(180deg, #1a3a1a, #0a1a0a); box-shadow: 0 0 15px rgba(74,223,74,0.6); animation: arenaGlow 2s ease-in-out infinite; }
+        @keyframes arenaGlow { 0%, 100% { box-shadow: 0 0 15px rgba(74,223,74,0.6); } 50% { box-shadow: 0 0 25px rgba(74,223,74,1); } }
+        .glory-item.locked { opacity: 0.55; filter: grayscale(0.5); }
+        .glory-item-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; filter: drop-shadow(0 3px 4px rgba(0,0,0,0.6)); flex-shrink: 0; border: 2px solid #4a3a1a; position: relative; overflow: hidden; }
+        .glory-item-icon::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.06) 5px, rgba(255,255,255,0.06) 10px); }
+        .glory-item-icon .lock-mark { position: absolute; top: 2px; right: 2px; font-size: 12px; }
+        .glory-item-info { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+        .glory-item-name { color: #ffd966; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 1px 1px 0 #000; }
+        .glory-item.current .glory-item-name { color: #a8ffa8; }
+        .glory-item.locked .glory-item-name { color: #6a7a9a; }
+        .glory-item-req { color: #8a9ab8; font-size: 10px; font-weight: 700; }
+        .glory-item.current .glory-item-req { color: #a8ffa8; font-weight: 900; }
+        .glory-item-status { font-size: 18px; flex-shrink: 0; filter: drop-shadow(0 2px 3px black); }
+        .glory-connector { height: 6px; width: 3px; background: linear-gradient(180deg, #4a3a1a, #8a6a2a); margin: 0 auto; border-radius: 2px; }
+        .glory-connector.unlocked { background: linear-gradient(180deg, #4adf4a, #ffd966); box-shadow: 0 0 6px rgba(74,223,74,0.6); }
+
+        .chest-modal { background: linear-gradient(180deg, #1e3460, #142444); border-radius: 20px; padding: 24px 20px; border: 3px solid #8a6a2a; box-shadow: 0 0 0 3px #4a3a1a, 0 25px 50px rgba(0,0,0,0.9); max-width: 400px; width: 100%; text-align: center; animation: modalIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+        .chest-modal-emoji { font-size: 80px; margin-bottom: 8px; animation: chestShake 0.6s ease-in-out infinite alternate; }
+        @keyframes chestShake { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+        .chest-modal-title { color: #ffd966; font-size: 22px; font-weight: 900; text-shadow: 2px 2px 0 #000; text-transform: uppercase; margin-bottom: 6px; }
+        .chest-modal-desc { color: #8a9ab8; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+        .chest-rewards { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; margin-bottom: 16px; border: 1px solid rgba(255,215,0,0.15); }
+        .reward-row { display: flex; justify-content: space-between; padding: 8px 6px; font-size: 14px; }
+        .reward-row + .reward-row { border-top: 1px dashed rgba(255,215,0,0.1); }
+        .reward-label { color: #e8e0d0; font-weight: 700; }
+        .reward-value { color: #ffd966; font-weight: 900; }
+        .reward-value.gem { color: #4adf4a; }
+        .reward-value.card { color: #b44cff; }
+        .chest-open-btn { width: 100%; padding: 14px; border-radius: 50px; font-size: 16px; font-weight: 900; text-transform: uppercase; cursor: pointer; background: linear-gradient(180deg, #ffd966, #b87a10); color: #3a1e00; border: 2px solid #ffe68a; font-family: inherit; box-shadow: 0 6px 0 #7a4e08; }
+        .chest-open-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a4e08; }
+
+        /* ===== РЕКЛАМА ===== */
+        .ad-modal {
+            background: linear-gradient(180deg, #1e3460, #142444);
+            border-radius: 20px; padding: 24px 20px;
+            border: 3px solid #8a6a2a;
+            box-shadow: 0 0 0 3px #4a3a1a, 0 25px 50px rgba(0,0,0,0.9);
+            max-width: 380px; width: 100%; text-align: center;
+            animation: modalIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .ad-title { color: #ffd966; font-size: 20px; font-weight: 900; text-shadow: 2px 2px 0 #000; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 2px; }
+        .ad-video {
+            background: linear-gradient(135deg, #0a0a1a, #1a1a3a);
+            border-radius: 12px; padding: 28px 20px; margin-bottom: 14px;
+            border: 2px solid #4a3a1a;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .ad-video-icon { font-size: 56px; animation: adFloat 2s ease-in-out infinite; }
+        @keyframes adFloat { 0%,100% { transform: translateY(0) rotate(-5deg); } 50% { transform: translateY(-6px) rotate(5deg); } }
+        .ad-video-text { color: #8a9ab8; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .ad-timer {
+            font-size: 42px; font-weight: 900; color: #ffd966;
+            text-shadow: 2px 2px 0 #000, 0 0 20px rgba(255,215,0,0.5);
+            margin-bottom: 6px; line-height: 1;
+        }
+        .ad-desc { color: #8a9ab8; font-size: 11px; font-weight: 700; margin-bottom: 14px; }
+        .ad-skip-btn {
+            width: 100%; padding: 14px; border-radius: 50px; font-size: 14px;
+            font-weight: 900; text-transform: uppercase; cursor: pointer;
+            background: linear-gradient(180deg, #4adf4a, #2a9a2a); color: #fff;
+            border: 2px solid #a8ffa8; font-family: inherit;
+            box-shadow: 0 6px 0 #1a5a1a; letter-spacing: 1px;
+            transition: 0.1s;
+        }
+        .ad-skip-btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 2px 0 #1a5a1a; }
+        .ad-skip-btn:disabled {
+            background: linear-gradient(180deg, #3a4a5a, #1a2a3a);
+            color: #8a9ab8; cursor: not-allowed;
+            border-color: #4a5a6a; box-shadow: 0 6px 0 #0a1a2a;
+        }
+        .shop-buy:disabled {
+            background: linear-gradient(180deg, #3a4a5a, #1a2a3a);
+            color: #6a7a8a; cursor: not-allowed;
+            border-color: #4a5a6a; box-shadow: 0 3px 0 #0a1a2a;
+            transform: none;
+        }
+
+        .toast {
+            position: fixed; top: 25%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(180deg, #1e3460, #142444);
+            padding: 16px 32px; border-radius: 30px; font-size: 16px;
+            font-weight: 900; color: #ffd966;
+            border: 3px solid #8a6a2a; z-index: 400;
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: none; text-align: center;
+            text-transform: uppercase; letter-spacing: 1px;
+            max-width: 90vw;
+        }
+        .toast.show { transform: translate(-50%, -50%) scale(1); }
+        .hint { text-align: center; color: #6a7a9a; font-size: 10px; margin-top: 8px; font-weight: 600; }
+        .hidden { display: none !important; }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 480px) {
+            .app { border-radius: 0; height: 100vh; height: 100dvh; }
+            .content { padding: 8px; }
+            .page-title { font-size: 18px; }
+            .card-pool { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+            .pool-card .pool-emoji { width: 28px; height: 28px; }
+            .pool-card .pool-name { font-size: 6px; }
+            .deck-slots { gap: 6px; }
+            .deck-slot .slot-emoji { width: 34px; height: 34px; }
+            .deck-slot .slot-name { font-size: 7px; }
+            .shop-item { flex-direction: column; text-align: center; gap: 8px; }
+            .shop-price { flex-direction: row; }
+            .controls { flex-wrap: wrap; }
+            .card-panel { order: 1; width: 100%; }
+            .elixir-container { order: 2; }
+            .next-card-indicator { order: 3; }
+            .rp-card { flex-direction: column; text-align: center; }
+            .rp-arrow { display: none; }
+            .modal-overlay { padding: 8px; }
+            .upgrade-modal { padding: 14px; }
+            .modal-card-emoji { width: 70px; height: 70px; }
+            .rp-modal { padding: 12px 8px; }
+        }
+        @media (max-width: 360px) {
+            .card-pool { grid-template-columns: repeat(3, 1fr); }
+            .deck-slots { grid-template-columns: repeat(4, 1fr); }
+            .nav-btn .nav-icon { font-size: 16px; }
+            .nav-btn .nav-label { font-size: 7px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== ЭКРАН ВХОДА ===== -->
+<div class="auth-screen" id="authScreen">
+    <div class="auth-logo">👑</div>
+    <div class="auth-title">Clash Royale Mini</div>
+    <div class="auth-subtitle" id="authSubtitle">Войди или создай аккаунт</div>
+    <div class="auth-form">
+        <input class="auth-input" id="authNickname" type="text" placeholder="Никнейм" maxlength="16" autocomplete="off">
+        <input class="auth-input" id="authPassword" type="password" placeholder="Пароль" maxlength="32" autocomplete="off">
+        <div class="auth-error" id="authError"></div>
+        <button class="auth-btn" id="authLoginBtn">Войти</button>
+        <button class="auth-btn secondary" id="authRegisterBtn">Создать аккаунт</button>
+    </div>
+    <div class="auth-switch" id="authSwitchText">Нет аккаунта? <span id="authSwitchLink">Зарегистрироваться</span></div>
+</div>
+
+<div class="app" id="appContainer" style="display:none;">
+    <div class="top-bar">
+        <div class="player-info">
+            <div class="avatar">👑</div>
+            <div class="player-col">
+                <span class="player-name" id="topPlayerName">Король</span>
+                <div class="arena-badge" id="topArenaBadge">🏰 Деревянная арена</div>
+            </div>
+        </div>
+        <div class="trophy-badge">
+            <span class="trophy-icon">🏆</span>
+            <span class="trophy-value" id="topTrophyValue">0</span>
+        </div>
+        <div class="trophy-badge" style="border-color: #4a8a2a; padding: 3px 10px 3px 6px;">
+            <span class="trophy-icon" style="font-size: 12px;">🪙</span>
+            <span class="trophy-value" id="topCoinValue" style="font-size: 11px;">0</span>
+        </div>
+        <div class="trophy-badge" style="border-color: #4a6a8a; padding: 3px 10px 3px 6px;">
+            <span class="trophy-icon" style="font-size: 12px;">💎</span>
+            <span class="trophy-value" id="topGemValue" style="font-size: 11px;">0</span>
+        </div>
+        <button class="btn-small" id="logoutBtn" style="font-size:10px; padding:4px 8px; margin-left:4px;" title="Выйти">🚪</button>
+    </div>
+
+    <div class="content" id="contentArea">
+        <div class="tab-page active" id="tab-shop">
+            <div class="page-title">🛒 Магазин</div>
+            <div class="section">
+                <div class="section-header"><div class="section-title">🃏 Наборы карт</div></div>
+                <div class="shop-item">
+                    <div class="shop-icon">🎴</div>
+                    <div class="shop-info"><div class="shop-name">Малый набор</div><div class="shop-desc">12 карт · по 1–30 копий каждая</div></div>
+                    <div class="shop-price"><div class="shop-cost">100 🪙</div><button class="shop-buy" data-pack="small">Купить</button></div>
+                </div>
+                <div class="shop-item">
+                    <div class="shop-icon">🃏</div>
+                    <div class="shop-info"><div class="shop-name">Средний набор</div><div class="shop-desc">12 карт · по 1–60 копий каждая</div></div>
+                    <div class="shop-price"><div class="shop-cost">250 🪙</div><button class="shop-buy" data-pack="medium">Купить</button></div>
+                </div>
+                <div class="shop-item">
+                    <div class="shop-icon">🎁</div>
+                    <div class="shop-info"><div class="shop-name">Большой набор</div><div class="shop-desc">12 карт · по 1–100 копий каждая</div></div>
+                    <div class="shop-price"><div class="shop-cost">500 🪙</div><button class="shop-buy" data-pack="large">Купить</button></div>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-header"><div class="section-title">💰 Ежедневные награды</div></div>
+                <div class="shop-item">
+                    <div class="shop-icon">📺</div>
+                    <div class="shop-info">
+                        <div class="shop-name">Монеты за рекламу</div>
+                        <div class="shop-desc">+100 монет за просмотр 15-секундной рекламы</div>
+                    </div>
+                    <div class="shop-price">
+                        <div class="shop-cost" id="adCostLabel">15 сек 📺</div>
+                        <button class="shop-buy" id="buyFreeBtn">Смотреть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-page" id="tab-collection">
+            <div class="page-title">🃏 Коллекция</div>
+            <div class="deck-selector" id="deckSelector"></div>
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title" id="currentDeckLabel">Колода 1</div>
+                    <div class="deck-counter" id="deckCounter">8 / 8</div>
+                </div>
+                <div class="deck-slots" id="deckSlots"></div>
+                <div class="hint">Нажми на карту в колоде чтобы убрать её</div>
+                <div class="deck-actions">
+                    <button class="deck-action-btn" id="copyDeckBtn">📋 Копировать</button>
+                    <button class="deck-action-btn" id="pasteDeckBtn">📥 Вставить</button>
+                    <button class="deck-action-btn clear" id="clearDeckBtn">🗑️ Очистить</button>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-header"><div class="section-title">📚 Все карты · нажми для действий</div></div>
+                <div class="card-pool" id="cardPool"></div>
+            </div>
+        </div>
+
+        <div class="tab-page" id="tab-battle">
+            <div class="section" id="battleLobbySection">
+                <div class="section-header">
+                    <div class="section-title">👑 Royale Pass</div>
+                    <div class="deck-counter" id="royalPassBadge">0 / 50</div>
+                </div>
+                <div class="rp-card" id="royalPassCard">
+                    <div class="rp-icon">🎫</div>
+                    <div class="rp-info">
+                        <div class="rp-level">Уровень <span id="rpLevel">0</span></div>
+                        <div class="rp-progress-track">
+                            <div class="rp-progress-fill" id="rpProgressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="rp-progress-text">👑 <span id="rpCrowns">0</span> / <span id="rpNeeded">10</span> корон</div>
+                    </div>
+                    <div class="rp-arrow">›</div>
+                    <div id="rpNewBadge"></div>
+                </div>
+
+                <div class="arena-center-wrap" style="margin-top:16px;">
+                    <div class="arena-center" id="arenaCenterBtn">
+                        <div class="arena-center-emoji" id="arenaCenterEmoji">🏰</div>
+                    </div>
+                    <div class="arena-center-name" id="arenaCenterName">Деревянная арена</div>
+                    <div class="arena-center-trophies">
+                        <span class="icon">🏆</span>
+                        <span class="value" id="arenaCenterTrophies">0</span>
+                    </div>
+                    <div class="arena-path-hint">👆 Нажми, чтобы открыть Путь славы</div>
+                </div>
+
+                <div style="text-align:center; padding:4px 0 8px;">
+                    <div style="color:#ffd966; font-size:13px; font-weight:900; letter-spacing:1px;" id="battleDeckName">Колода 1</div>
+                </div>
+
+                <button class="btn-battle" id="battleBtn">⚔️ В БОЙ!</button>
+                <div class="hint" id="battleHint">Собери ровно 8 карт, чтобы начать бой</div>
+                <div class="hint" style="margin-top:4px; color:#4adf4a; font-weight:900;">
+                    👑 1 башня = 2 · 2 башни = 4 · 3 башни = 8
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div class="section-header">
+                        <div class="section-title">🎁 Сундуки за победы</div>
+                        <div class="deck-counter" id="chestCounter">0 / 4</div>
+                    </div>
+                    <div class="chest-row" id="chestRow"></div>
+                    <div class="hint">Побеждай в боях — получай сундуки!</div>
+                </div>
+            </div>
+
+            <div id="battleArenaSection" class="hidden">
+                <div class="game-header">
+                    <div class="trophy-badge" style="font-size:11px; padding:3px 10px 3px 6px;">
+                        <span class="trophy-icon" style="font-size:14px;">🏆</span>
+                        <span class="trophy-value" id="battleTrophyValue" style="font-size:13px;">0</span>
+                    </div>
+                    <div class="enemy-elixir-bar">
+                        <span class="enemy-elixir-icon">⚡</span>
+                        <div class="enemy-elixir-track"><div class="enemy-elixir-fill" id="enemyElixirFill" style="width: 0%"></div></div>
+                        <span class="enemy-elixir-text" id="enemyElixirText">0</span>
+                    </div>
+                    <button class="btn-small" id="forfeitBtn">🏳️</button>
+                </div>
+                <canvas id="gameCanvas" width="400" height="600"></canvas>
+                <div class="controls">
+                    <div class="card-panel" id="cardPanel"></div>
+                    <div class="next-card-indicator">
+                        <div class="next-label">Далее</div>
+                        <div class="next-card" id="nextCardIndicator"><div class="emoji">?</div></div>
+                    </div>
+                    <div class="elixir-container">
+                        <div class="elixir-bar"><div class="elixir-fill" id="elixirFill" style="width: 100%"></div></div>
+                        <div class="elixir-text" id="elixirText">10</div>
+                    </div>
+                </div>
+                <div class="hint">Нажми на карту, затем на разрешённую зону (не красную)</div>
+            </div>
+        </div>
+
+        <div class="tab-page" id="tab-clan">
+            <div class="page-title">🛡️ Клан</div>
+            <div class="clan-card">
+                <div class="clan-emblem">🛡️</div>
+                <div class="clan-name">Королевские Рыцари</div>
+                <div class="clan-tag">#CRMINI</div>
+                <div class="clan-stats">
+                    <div class="clan-stat"><div class="clan-stat-value">15</div><div class="clan-stat-label">Участники</div></div>
+                    <div class="clan-stat"><div class="clan-stat-value">12480</div><div class="clan-stat-label">Трофеи</div></div>
+                    <div class="clan-stat"><div class="clan-stat-value">#1</div><div class="clan-stat-label">Ранг</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-btn active" data-tab="shop"><span class="nav-icon">🛒</span><span class="nav-label">Магазин</span></button>
+        <button class="nav-btn" data-tab="collection"><span class="nav-icon">🃏</span><span class="nav-label">Коллекция</span></button>
+        <button class="nav-btn" data-tab="battle"><span class="nav-icon">⚔️</span><span class="nav-label">В бой</span></button>
+        <button class="nav-btn" data-tab="clan"><span class="nav-icon">🛡️</span><span class="nav-label">Клан</span></button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="upgradeModal">
+    <div class="upgrade-modal">
+        <img class="modal-card-emoji" id="modalEmoji" src="" alt="">
+        <div class="modal-card-name" id="modalName">Карта</div>
+        <div class="modal-card-rarity" id="modalRarity">ОБЫЧНАЯ</div>
+        <div id="inDeckBadgeWrapper"></div>
+        <div class="level-progress">
+            <div class="level-badge-big" id="modalLevelCurrent">1</div>
+            <div class="arrow">➜</div>
+            <div class="level-badge-big next" id="modalLevelNext">2</div>
+        </div>
+        <div class="stats-block" id="modalStats"></div>
+        <div class="requirements">
+            <div class="req-row"><div class="req-label">🪙 Монеты</div><div class="req-value" id="modalCoinReq">0</div></div>
+            <div class="req-row"><div class="req-label">🃏 Карты</div><div class="req-value" id="modalCardReq">0</div></div>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-btn modal-btn-cancel" id="modalCancelBtn">✕</button>
+            <button class="modal-btn modal-btn-use" id="modalUseBtn">ИСПОЛЬЗОВАТЬ</button>
+            <button class="modal-btn modal-btn-upgrade" id="modalUpgradeBtn">УЛУЧШИТЬ</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="chestModal">
+    <div class="chest-modal">
+        <div class="chest-modal-emoji" id="chestModalEmoji">🎁</div>
+        <div class="chest-modal-title" id="chestModalTitle">Сундук</div>
+        <div class="chest-modal-desc" id="chestModalDesc">Нажми чтобы открыть!</div>
+        <div class="chest-rewards" id="chestRewards"></div>
+        <button class="chest-open-btn" id="chestOpenBtn">ОТКРЫТЬ</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="gloryModal">
+    <div class="glory-modal">
+        <div class="glory-title">🌟 Путь славы</div>
+        <div class="glory-subtitle">Проходи арены, зарабатывая кубки</div>
+        <div class="glory-path" id="gloryPath"></div>
+        <button class="glory-close-btn" id="gloryCloseBtn">Закрыть</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="royalPassModal">
+    <div class="rp-modal">
+        <div class="rp-modal-title">👑 Royale Pass</div>
+        <div class="rp-modal-subtitle">
+            <span>👑 Корон: <span id="rpModalCrowns">0</span></span>
+            <span>·</span>
+            <span>Уровень <span id="rpModalLevel">0</span> / 50</span>
+        </div>
+        <div class="rp-list" id="rpList"></div>
+        <button class="rp-close-btn" id="rpCloseBtn">Закрыть</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="adModal">
+    <div class="ad-modal">
+        <div class="ad-title">📺 Реклама</div>
+        <div class="ad-video">
+            <div class="ad-video-icon">🎬</div>
+            <div class="ad-video-text">Реклама идёт...</div>
+        </div>
+        <div class="ad-timer" id="adTimer">15</div>
+        <div class="ad-desc">Пожалуйста, подожди 15 секунд</div>
+        <button class="ad-skip-btn" id="adSkipBtn" disabled>Подожди 15с...</button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    (function() {
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const W = 400, H = 600;
+        canvas.width = W; canvas.height = H;
+        const RIVER_Y = 280, BRIDGE_LEFT_X = 80, BRIDGE_RIGHT_X = 320, BRIDGE_WIDTH = 60;
+        const RIVER_TOP = RIVER_Y - 20, RIVER_BOTTOM = RIVER_Y + 20;
+        const TOWER_RADIUS = 24, KING_TOWER_RADIUS = 32;
+        const KING_SAFE_DIST = KING_TOWER_RADIUS + 40;
+        const PLAYER_KING = { x: 200, y: 540 }, ENEMY_KING = { x: 200, y: 60 };
+        const PLAYER_LEFT_TOWER = { x: 80, y: 480 }, PLAYER_RIGHT_TOWER = { x: 320, y: 480 };
+        const ENEMY_LEFT_TOWER = { x: 80, y: 120 }, ENEMY_RIGHT_TOWER = { x: 320, y: 120 };
+        const MAX_LEVEL = 14;
+        const SPLASH_RADIUS = 45;
+        const STORAGE_KEY = 'clash_royale_mini_save_v1';
+        const AUTH_KEY = 'clash_royale_mini_accounts';
+
+        // Деление вражеской половины на 4 четверти (2×2)
+        const ENEMY_MID_Y = RIVER_TOP / 2;   // 130 — граница верх/низ
+        const ENEMY_MID_X = W / 2;           // 200 — граница лево/право
+
+        const ARENAS = [
+            { id: 1, name: 'Деревянная арена', icon: '🏰', req: 0, color1: '#3d6b3d', color2: '#2e5a2e', river: '#2a6b8a', bridge: '#8b6b4b' },
+            { id: 2, name: 'Костяная яма', icon: '💀', req: 500, color1: '#4a5a3d', color2: '#38442a', river: '#4a7a8a', bridge: '#7a6a5a' },
+            { id: 3, name: 'Варварская арена', icon: '🪓', req: 1000, color1: '#5a4a2a', color2: '#3a2a1a', river: '#4a6a7a', bridge: '#6a4a2a' },
+            { id: 4, name: 'Арена П.Е.К.К.А.', icon: '🤖', req: 1500, color1: '#3a4a6a', color2: '#2a3a5a', river: '#3a6a9a', bridge: '#5a6a7a' },
+            { id: 5, name: 'Арена заклинаний', icon: '🔮', req: 2000, color1: '#5a3a7a', color2: '#3a2a5a', river: '#6a3a9a', bridge: '#6a5a8a' },
+            { id: 6, name: 'Мастерская', icon: '⚙️', req: 2500, color1: '#6a5a2a', color2: '#4a3a1a', river: '#7a6a2a', bridge: '#8a6a3a' },
+            { id: 7, name: 'Королевская арена', icon: '👑', req: 3000, color1: '#7a6a3a', color2: '#5a4a2a', river: '#4a8aaa', bridge: '#9a7a4a' },
+            { id: 8, name: 'Ледяная арена', icon: '❄️', req: 3500, color1: '#5a7a9a', color2: '#3a5a7a', river: '#3a8ac0', bridge: '#7a9ab0' },
+            { id: 9, name: 'Драконье логово', icon: '🐲', req: 4000, color1: '#6a2a2a', color2: '#4a1a1a', river: '#aa3a1a', bridge: '#7a3a2a' },
+            { id: 10, name: 'Легендарная арена', icon: '🌟', req: 4500, color1: '#4a2a7a', color2: '#2a1a5a', river: '#d84ff0', bridge: '#ffd966' }
+        ];
+
+        function getCurrentArena() {
+            let current = ARENAS[0];
+            for (const arena of ARENAS) { if (trophies >= arena.req) current = arena; }
+            return current;
+        }
+
+        // ============ БАЗА ИЗОБРАЖЕНИЙ ============
+        const IMG = (slug) => `https://cdn.royaleapi.com/static/img/cards-150/${slug}.png`;
+
+        // ============ ПОЛНЫЙ СПИСОК КАРТ (стоимость эликсира обновлена по реальным данным) ============
+        const ALL_CARDS = [
+            // ===== ОБЫЧНЫЕ (COMMON) =====
+            { id: 'knight', name: 'Рыцарь', emoji: '⚔️', cost: 3, rarity: 'Common', hp: 1766, dmg: 168, speed: 1.0, range: 28, color: '#b87333', size: 18, isRanged: false, image: IMG('knight') },
+            { id: 'archer', name: 'Лучницы', emoji: '🏹', cost: 3, rarity: 'Common', hp: 304, dmg: 106, speed: 1.0, range: 130, color: '#3b7a57', size: 16, isRanged: true, projectileSpeed: 400, projectileColor: '#f5e7d3', image: IMG('archers') },
+            { id: 'minion', name: 'Миньоны', emoji: '🐦', cost: 3, rarity: 'Common', hp: 230, dmg: 117, speed: 1.6, range: 25, color: '#4b3b6b', size: 16, isRanged: false, isSwarm: true, image: IMG('minions') },
+            { id: 'goblin', name: 'Гоблины', emoji: '👺', cost: 2, rarity: 'Common', hp: 202, dmg: 109, speed: 1.8, range: 22, color: '#4a7a3a', size: 15, isRanged: false, isSwarm: true, image: IMG('goblins') },
+            { id: 'skeletons', name: 'Скелеты', emoji: '💀', cost: 1, rarity: 'Common', hp: 81, dmg: 81, speed: 2.0, range: 20, color: '#aaaaaa', size: 12, isRanged: false, isSwarm: true, image: IMG('skeletons') },
+            { id: 'spear_goblins', name: 'Гоблины-копейщики', emoji: '🗡️', cost: 2, rarity: 'Common', hp: 133, dmg: 47, speed: 1.8, range: 110, color: '#4a8a3a', size: 14, isRanged: true, isSwarm: true, projectileSpeed: 450, projectileColor: '#aaffaa', image: IMG('spear-goblins') },
+            { id: 'bomber', name: 'Подрывник', emoji: '💣', cost: 3, rarity: 'Common', hp: 311, dmg: 271, speed: 1.2, range: 100, color: '#6a6a6a', size: 15, isRanged: true, projectileSpeed: 300, projectileColor: '#ff6a2a', image: IMG('bomber') },
+            { id: 'barbarians', name: 'Варвары', emoji: '🪓', cost: 5, rarity: 'Common', hp: 636, dmg: 159, speed: 1.1, range: 25, color: '#b87333', size: 17, isRanged: false, isSwarm: true, image: IMG('barbarians') },
+            { id: 'electro_spirit', name: 'Электрический дух', emoji: '⚡', cost: 1, rarity: 'Common', hp: 230, dmg: 100, speed: 2.0, range: 20, color: '#4a8aff', size: 12, isRanged: false, image: IMG('electro-spirit') },
+            { id: 'fire_spirit', name: 'Огненный дух', emoji: '🔥', cost: 1, rarity: 'Common', hp: 230, dmg: 178, speed: 2.0, range: 20, color: '#ff4a2a', size: 12, isRanged: false, image: IMG('fire-spirit') },
+            { id: 'ice_spirit', name: 'Ледяной дух', emoji: '❄️', cost: 1, rarity: 'Common', hp: 230, dmg: 91, speed: 2.0, range: 20, color: '#4ac8ff', size: 12, isRanged: false, image: IMG('ice-spirit') },
+            { id: 'bats', name: 'Летучие мыши', emoji: '🦇', cost: 2, rarity: 'Common', hp: 81, dmg: 67, speed: 2.2, range: 20, color: '#3a2a4a', size: 12, isRanged: false, isSwarm: true, image: IMG('bats') },
+            { id: 'royal_recruits', name: 'Королевские рекруты', emoji: '🛡️', cost: 7, rarity: 'Common', hp: 787, dmg: 102, speed: 0.9, range: 25, color: '#4a6a9a', size: 18, isRanged: false, isSwarm: true, image: IMG('royal-recruits') },
+            { id: 'royal_giant', name: 'Королевский гигант', emoji: '🗿', cost: 6, rarity: 'Common', hp: 3164, dmg: 180, speed: 0.7, range: 130, color: '#5a7a9a', size: 24, isRanged: true, projectileSpeed: 350, projectileColor: '#aaccff', targetsBuildingsOnly: true, image: IMG('royal-giant') },
+            { id: 'berserker', name: 'Берсерк', emoji: '🪓', cost: 2, rarity: 'Common', hp: 896, dmg: 204, speed: 1.4, range: 25, color: '#8a4a2a', size: 17, isRanged: false, image: IMG('berserker') },
+            { id: 'skeleton_barrel', name: 'Бочка со скелетами', emoji: '🛢️', cost: 3, rarity: 'Common', hp: 636, dmg: 67, speed: 1.0, range: 20, color: '#aaaaaa', size: 16, isRanged: false, targetsBuildingsOnly: true, image: IMG('skeleton-barrel') },
+            { id: 'goblin_gang', name: 'Банда гоблинов', emoji: '👺', cost: 3, rarity: 'Common', hp: 202, dmg: 109, speed: 1.8, range: 22, color: '#4a7a3a', size: 15, isRanged: false, isSwarm: true, image: IMG('goblin-gang') },
+            { id: 'elite_barbarians', name: 'Элитные варвары', emoji: '💪', cost: 6, rarity: 'Common', hp: 1341, dmg: 274, speed: 1.3, range: 25, color: '#8a5a2a', size: 19, isRanged: false, isSwarm: true, image: IMG('elite-barbarians') },
+            { id: 'minion_horde', name: 'Орда миньонов', emoji: '🐦', cost: 5, rarity: 'Common', hp: 230, dmg: 117, speed: 1.6, range: 25, color: '#4b3b6b', size: 16, isRanged: false, isSwarm: true, image: IMG('minion-horde') },
+            { id: 'firecracker', name: 'Огненная лучница', emoji: '🧨', cost: 3, rarity: 'Common', hp: 304, dmg: 106, speed: 1.0, range: 140, color: '#ff8a3a', size: 15, isRanged: true, projectileSpeed: 450, projectileColor: '#ffaa4a', image: IMG('firecracker') },
+            { id: 'skeleton_dragons', name: 'Скелеты-драконы', emoji: '🐉', cost: 4, rarity: 'Common', hp: 560, dmg: 84, speed: 1.1, range: 120, color: '#aaaaaa', size: 16, isRanged: true, isSwarm: true, projectileSpeed: 350, projectileColor: '#dddddd', image: IMG('skeleton-dragons') },
+            { id: 'suspicious_bush', name: 'Подозрительный куст', emoji: '🌿', cost: 2, rarity: 'Common', hp: 81, dmg: 0, speed: 1.0, range: 20, color: '#4a8a2a', size: 14, isRanged: false, image: IMG('suspicious-bush') },
+            { id: 'rascals', name: 'Разбойники', emoji: '🗡️', cost: 5, rarity: 'Common', hp: 1940, dmg: 136, speed: 1.1, range: 25, color: '#8a6a3a', size: 20, isRanged: false, image: IMG('rascals') },
+            { id: 'goblin_demolisher', name: 'Гоблин-разрушитель', emoji: '💣', cost: 4, rarity: 'Common', hp: 1300, dmg: 155, speed: 1.0, range: 110, color: '#4a7a3a', size: 17, isRanged: true, projectileSpeed: 300, projectileColor: '#ff6a2a', image: IMG('goblin-demolisher') },
+
+            // ===== РЕДКИЕ (RARE) =====
+            { id: 'giant', name: 'Гигант', emoji: '🗿', cost: 5, rarity: 'Rare', hp: 4090, dmg: 168, speed: 0.7, range: 32, color: '#7a5c3a', size: 22, isRanged: false, targetsBuildingsOnly: true, image: IMG('giant') },
+            { id: 'valkyrie', name: 'Валькирия', emoji: '🛡️', cost: 4, rarity: 'Rare', hp: 1908, dmg: 246, speed: 1.0, range: 28, color: '#a05030', size: 19, isRanged: false, image: IMG('valkyrie') },
+            { id: 'musketeer', name: 'Мушкетёр', emoji: '🔫', cost: 4, rarity: 'Rare', hp: 721, dmg: 217, speed: 0.95, range: 150, color: '#4a4a8a', size: 17, isRanged: true, projectileSpeed: 500, projectileColor: '#ffe68a', image: IMG('musketeer') },
+            { id: 'hog_rider', name: 'Всадник на кабане', emoji: '🐗', cost: 4, rarity: 'Rare', hp: 1697, dmg: 198, speed: 1.6, range: 28, color: '#8a5a3a', size: 19, isRanged: false, targetsBuildingsOnly: true, image: IMG('hog-rider') },
+            { id: 'mini_pekka', name: 'Мини-П.Е.К.К.А.', emoji: '🤖', cost: 4, rarity: 'Rare', hp: 1433, dmg: 471, speed: 1.3, range: 28, color: '#3a5a7a', size: 18, isRanged: false, image: IMG('mini-pekka') },
+            { id: 'wizard', name: 'Колдун', emoji: '🧙', cost: 5, rarity: 'Rare', hp: 885, dmg: 337, speed: 0.9, range: 140, color: '#6a3a9a', size: 18, isRanged: true, projectileSpeed: 350, projectileColor: '#ff8a2a', image: IMG('wizard') },
+            { id: 'mega_minion', name: 'Мега-миньон', emoji: '🦅', cost: 3, rarity: 'Rare', hp: 837, dmg: 207, speed: 1.1, range: 25, color: '#3a4a6a', size: 18, isRanged: false, image: IMG('mega-minion') },
+            { id: 'battle_ram', name: 'Боевой таран', emoji: '🐏', cost: 4, rarity: 'Rare', hp: 967, dmg: 246, speed: 1.2, range: 25, color: '#8a6a4a', size: 18, isRanged: false, targetsBuildingsOnly: true, image: IMG('battle-ram') },
+            { id: 'flying_machine', name: 'Летающая машина', emoji: '🛩️', cost: 4, rarity: 'Rare', hp: 614, dmg: 155, speed: 1.0, range: 120, color: '#6a8a9a', size: 17, isRanged: true, projectileSpeed: 400, projectileColor: '#aaddff', image: IMG('flying-machine') },
+            { id: 'royal_hogs', name: 'Королевские кабаны', emoji: '🐖', cost: 5, rarity: 'Rare', hp: 837, dmg: 61, speed: 1.5, range: 25, color: '#d88a8a', size: 17, isRanged: false, isSwarm: true, targetsBuildingsOnly: true, image: IMG('royal-hogs') },
+            { id: 'three_musketeers', name: 'Три мушкетёра', emoji: '🔫', cost: 9, rarity: 'Rare', hp: 721, dmg: 217, speed: 0.95, range: 150, color: '#4a4a8a', size: 17, isRanged: true, projectileSpeed: 500, projectileColor: '#ffe68a', isSwarm: true, image: IMG('three-musketeers') },
+            { id: 'battle_healer', name: 'Целительница-воин', emoji: '💚', cost: 4, rarity: 'Rare', hp: 1717, dmg: 98, speed: 1.0, range: 60, color: '#4adf8a', size: 18, isRanged: false, image: IMG('battle-healer') },
+            { id: 'ice_golem', name: 'Ледяной голем', emoji: '🧊', cost: 2, rarity: 'Rare', hp: 1315, dmg: 33, speed: 0.8, range: 25, color: '#4ac8ff', size: 18, isRanged: false, targetsBuildingsOnly: true, image: IMG('ice-golem') },
+            { id: 'dart_goblin', name: 'Гоблин с дротиками', emoji: '🎯', cost: 3, rarity: 'Rare', hp: 261, dmg: 195, speed: 1.6, range: 140, color: '#4a8a3a', size: 15, isRanged: true, projectileSpeed: 600, projectileColor: '#aaffaa', image: IMG('dart-goblin') },
+            { id: 'zappies', name: 'Заппи', emoji: '⚡', cost: 4, rarity: 'Rare', hp: 529, dmg: 55, speed: 1.0, range: 100, color: '#4a8aff', size: 14, isRanged: true, isSwarm: true, projectileSpeed: 500, projectileColor: '#aaddff', image: IMG('zappies') },
+            { id: 'heal_spirit', name: 'Дух исцеления', emoji: '💚', cost: 1, rarity: 'Rare', hp: 230, dmg: 0, speed: 2.0, range: 20, color: '#4adf8a', size: 12, isRanged: false, image: IMG('heal-spirit') },
+            { id: 'elixir_golem', name: 'Эликсирный голем', emoji: '🟣', cost: 3, rarity: 'Rare', hp: 1569, dmg: 230, speed: 0.7, range: 25, color: '#b44cff', size: 20, isRanged: false, targetsBuildingsOnly: true, image: IMG('elixir-golem') },
+            { id: 'fireball', name: 'Огненный шар', emoji: '🔴', cost: 4, rarity: 'Rare', hp: 0, dmg: 689, speed: 0, range: 80, color: '#ff4a2a', size: 16, isRanged: false, isSpell: true, towerDamage: 276, image: IMG('fireball') },
+            { id: 'rocket', name: 'Ракета', emoji: '🚀', cost: 6, rarity: 'Rare', hp: 0, dmg: 1484, speed: 0, range: 60, color: '#ff6a2a', size: 20, isRanged: false, isSpell: true, towerDamage: 371, image: IMG('rocket') },
+            { id: 'earthquake', name: 'Землетрясение', emoji: '🌍', cost: 3, rarity: 'Rare', hp: 0, dmg: 243, speed: 0, range: 90, color: '#8a6a3a', size: 18, isRanged: false, isSpell: true, towerDamage: 159, image: IMG('earthquake') },
+            { id: 'cannon', name: 'Пушка', emoji: '💣', cost: 3, rarity: 'Rare', hp: 824, dmg: 212, speed: 0, range: 100, color: '#6a6a6a', size: 18, isRanged: true, isBuilding: true, projectileSpeed: 400, projectileColor: '#888888', image: IMG('cannon') },
+            { id: 'mortar', name: 'Мортира', emoji: '🎯', cost: 4, rarity: 'Rare', hp: 1369, dmg: 53, speed: 0, range: 180, color: '#6a6a6a', size: 20, isRanged: true, isBuilding: true, projectileSpeed: 250, projectileColor: '#aa8866', targetsBuildingsOnly: true, image: IMG('mortar') },
+            { id: 'tesla', name: 'Тесла', emoji: '⚡', cost: 4, rarity: 'Rare', hp: 1152, dmg: 200, speed: 0, range: 100, color: '#4a8aff', size: 18, isRanged: true, isBuilding: true, projectileSpeed: 600, projectileColor: '#aaddff', image: IMG('tesla') },
+            { id: 'goblin_hut', name: 'Хижина гоблинов', emoji: '🏠', cost: 5, rarity: 'Rare', hp: 1293, dmg: 0, speed: 0, range: 0, color: '#4a7a3a', size: 20, isRanged: false, isBuilding: true, isSpawner: true, image: IMG('goblin-hut') },
+            { id: 'barbarian_hut', name: 'Хижина варваров', emoji: '🏕️', cost: 7, rarity: 'Rare', hp: 1164, dmg: 0, speed: 0, range: 0, color: '#8a6a3a', size: 20, isRanged: false, isBuilding: true, isSpawner: true, image: IMG('barbarian-hut') },
+            { id: 'furnace', name: 'Печь', emoji: '🔥', cost: 4, rarity: 'Rare', hp: 1003, dmg: 0, speed: 0, range: 0, color: '#ff6a2a', size: 18, isRanged: false, isBuilding: true, isSpawner: true, image: IMG('furnace') },
+            { id: 'elixir_collector', name: 'Сборщик эликсира', emoji: '⚗️', cost: 5, rarity: 'Rare', hp: 888, dmg: 0, speed: 0, range: 0, color: '#b44cff', size: 20, isRanged: false, isBuilding: true, image: IMG('elixir-collector') },
+            { id: 'bomb_tower', name: 'Башня-бомбёжка', emoji: '💣', cost: 5, rarity: 'Rare', hp: 1356, dmg: 138, speed: 0, range: 110, color: '#6a6a6a', size: 19, isRanged: true, isBuilding: true, projectileSpeed: 300, projectileColor: '#888888', image: IMG('bomb-tower') },
+            { id: 'inferno_tower', name: 'Адская башня', emoji: '🔥', cost: 5, rarity: 'Rare', hp: 1748, dmg: 107, speed: 0, range: 120, color: '#ff4a2a', size: 19, isRanged: true, isBuilding: true, projectileSpeed: 500, projectileColor: '#ff8a2a', image: IMG('inferno-tower') },
+            { id: 'tombstone', name: 'Надгробие', emoji: '🪦', cost: 3, rarity: 'Rare', hp: 422, dmg: 0, speed: 0, range: 0, color: '#8a8a8a', size: 18, isRanged: false, isBuilding: true, isSpawner: true, image: IMG('tombstone') },
+
+            // ===== ЭПИЧЕСКИЕ (EPIC) =====
+            { id: 'pekka', name: 'П.Е.К.К.А.', emoji: '🤖', cost: 7, rarity: 'Epic', hp: 3760, dmg: 816, speed: 0.6, range: 30, color: '#3a5a7a', size: 24, isRanged: false, image: IMG('pekka') },
+            { id: 'golem', name: 'Голем', emoji: '🗿', cost: 8, rarity: 'Epic', hp: 5120, dmg: 124, speed: 0.5, range: 32, color: '#5a4a3a', size: 26, isRanged: false, targetsBuildingsOnly: true, image: IMG('golem') },
+            { id: 'witch', name: 'Ведьма', emoji: '🧙‍♀️', cost: 5, rarity: 'Epic', hp: 885, dmg: 133, speed: 0.9, range: 130, color: '#6a2a6a', size: 18, isRanged: true, projectileSpeed: 300, projectileColor: '#d84aff', image: IMG('witch') },
+            { id: 'baby_dragon', name: 'Дракончик', emoji: '🐉', cost: 4, rarity: 'Epic', hp: 1152, dmg: 155, speed: 1.2, range: 120, color: '#3a7a4a', size: 18, isRanged: true, projectileSpeed: 320, projectileColor: '#ff8a2a', image: IMG('baby-dragon') },
+            { id: 'guards', name: 'Стражи', emoji: '🛡️', cost: 3, rarity: 'Epic', hp: 337, dmg: 117, speed: 1.0, range: 25, color: '#8a8a8a', size: 15, isRanged: false, isSwarm: true, image: IMG('guards') },
+            { id: 'skeleton_army', name: 'Армия скелетов', emoji: '💀', cost: 4, rarity: 'Epic', hp: 81, dmg: 81, speed: 2.0, range: 20, color: '#aaaaaa', size: 12, isRanged: false, isSwarm: true, image: IMG('skeleton-army') },
+            { id: 'dark_prince', name: 'Тёмный принц', emoji: '🖤', cost: 4, rarity: 'Epic', hp: 1440, dmg: 190, speed: 1.1, range: 28, color: '#3a2a4a', size: 20, isRanged: false, image: IMG('dark-prince') },
+            { id: 'prince', name: 'Принц', emoji: '👑', cost: 5, rarity: 'Epic', hp: 1920, dmg: 279, speed: 1.1, range: 28, color: '#d84a8a', size: 21, isRanged: false, image: IMG('prince') },
+            { id: 'balloon', name: 'Воздушный шар', emoji: '🎈', cost: 5, rarity: 'Epic', hp: 1679, dmg: 320, speed: 0.8, range: 25, color: '#8a3a3a', size: 20, isRanged: false, targetsBuildingsOnly: true, image: IMG('balloon') },
+            { id: 'giant_skeleton', name: 'Гигантский скелет', emoji: '💀', cost: 6, rarity: 'Epic', hp: 3617, dmg: 197, speed: 0.7, range: 28, color: '#aaaaaa', size: 24, isRanged: false, image: IMG('giant-skeleton') },
+            { id: 'rune_giant', name: 'Руническая гигантша', emoji: '🗿', cost: 4, rarity: 'Epic', hp: 2662, dmg: 80, speed: 0.8, range: 28, color: '#8a6a3a', size: 23, isRanged: false, image: IMG('rune-giant') },
+            { id: 'goblin_giant', name: 'Гоблин-гигант', emoji: '👺', cost: 6, rarity: 'Epic', hp: 3233, dmg: 117, speed: 0.8, range: 110, color: '#4a7a3a', size: 24, isRanged: true, projectileSpeed: 350, projectileColor: '#aaffaa', targetsBuildingsOnly: true, image: IMG('goblin-giant') },
+            { id: 'hunter', name: 'Охотник', emoji: '🔫', cost: 4, rarity: 'Epic', hp: 885, dmg: 381, speed: 0.9, range: 100, color: '#6a5a4a', size: 18, isRanged: true, projectileSpeed: 500, projectileColor: '#ffcc88', image: IMG('hunter') },
+            { id: 'electro_dragon', name: 'Электродракон', emoji: '🐉', cost: 5, rarity: 'Epic', hp: 949, dmg: 91, speed: 1.0, range: 110, color: '#4a8aff', size: 19, isRanged: true, projectileSpeed: 400, projectileColor: '#aaddff', image: IMG('electro-dragon') },
+            { id: 'wall_breakers', name: 'Стенобои', emoji: '🧨', cost: 2, rarity: 'Epic', hp: 330, dmg: 320, speed: 1.8, range: 20, color: '#8a6a3a', size: 14, isRanged: false, isSwarm: true, targetsBuildingsOnly: true, image: IMG('wall-breakers') },
+            { id: 'electro_giant', name: 'Электрогигант', emoji: '⚡', cost: 7, rarity: 'Epic', hp: 3855, dmg: 77, speed: 0.7, range: 28, color: '#4a8aff', size: 24, isRanged: false, targetsBuildingsOnly: true, image: IMG('electro-giant') },
+            { id: 'bowler', name: 'Вышибала', emoji: '🎳', cost: 5, rarity: 'Epic', hp: 2081, dmg: 115, speed: 0.8, range: 110, color: '#6a5a3a', size: 21, isRanged: true, projectileSpeed: 350, projectileColor: '#aa8866', image: IMG('bowler') },
+            { id: 'executioner', name: 'Палач', emoji: '🪓', cost: 5, rarity: 'Epic', hp: 1280, dmg: 140, speed: 0.9, range: 110, color: '#4a3a2a', size: 20, isRanged: true, projectileSpeed: 300, projectileColor: '#ff8a4a', image: IMG('executioner') },
+            { id: 'cannon_cart', name: 'Повозка с пушкой', emoji: '🚃', cost: 5, rarity: 'Epic', hp: 1809, dmg: 236, speed: 0.9, range: 110, color: '#6a6a6a', size: 20, isRanged: true, projectileSpeed: 400, projectileColor: '#888888', image: IMG('cannon-cart') },
+            { id: 'rage', name: 'Ярость', emoji: '😡', cost: 2, rarity: 'Epic', hp: 0, dmg: 0, speed: 0, range: 90, color: '#ff4a8a', size: 18, isRanged: false, isSpell: true, image: IMG('rage') },
+            { id: 'clone', name: 'Клонирование', emoji: '👥', cost: 3, rarity: 'Epic', hp: 0, dmg: 0, speed: 0, range: 90, color: '#4ac8ff', size: 18, isRanged: false, isSpell: true, image: IMG('clone') },
+            { id: 'mirror', name: 'Зеркало', emoji: '🪞', cost: 1, rarity: 'Epic', hp: 0, dmg: 0, speed: 0, range: 0, color: '#c0c0c0', size: 16, isRanged: false, isSpell: true, image: IMG('mirror') },
+            { id: 'freeze', name: 'Заморозка', emoji: '❄️', cost: 4, rarity: 'Epic', hp: 0, dmg: 115, speed: 0, range: 80, color: '#4ac8ff', size: 18, isRanged: false, isSpell: true, towerDamage: 35, image: IMG('freeze') },
+            { id: 'poison', name: 'Яд', emoji: '☠️', cost: 4, rarity: 'Epic', hp: 0, dmg: 736, speed: 0, range: 90, color: '#8aff4a', size: 18, isRanged: false, isSpell: true, towerDamage: 184, image: IMG('poison') },
+            { id: 'lightning', name: 'Молния', emoji: '⚡', cost: 6, rarity: 'Epic', hp: 0, dmg: 1057, speed: 0, range: 70, color: '#4a8aff', size: 20, isRanged: false, isSpell: true, towerDamage: 286, image: IMG('lightning') },
+            { id: 'goblin_barrel', name: 'Гоблинская бочка', emoji: '🛢️', cost: 3, rarity: 'Epic', hp: 0, dmg: 0, speed: 0, range: 70, color: '#4a7a3a', size: 18, isRanged: false, isSpell: true, image: IMG('goblin-barrel') },
+            { id: 'tornado', name: 'Торнадо', emoji: '🌪️', cost: 3, rarity: 'Epic', hp: 0, dmg: 84, speed: 0, range: 100, color: '#8a8aff', size: 18, isRanged: false, isSpell: true, towerDamage: 27, image: IMG('tornado') },
+            { id: 'goblin_curse', name: 'Проклятие гоблинов', emoji: '💀', cost: 2, rarity: 'Epic', hp: 0, dmg: 180, speed: 0, range: 80, color: '#8a4aff', size: 18, isRanged: false, isSpell: true, towerDamage: 36, image: IMG('goblin-curse') },
+            { id: 'void', name: 'Пустота', emoji: '🕳️', cost: 3, rarity: 'Epic', hp: 0, dmg: 960, speed: 0, range: 80, color: '#4a2a6a', size: 18, isRanged: false, isSpell: true, towerDamage: 144, image: IMG('void') },
+            { id: 'x_bow', name: 'Арбалет', emoji: '🏹', cost: 6, rarity: 'Epic', hp: 1600, dmg: 143, speed: 0, range: 180, color: '#8a6a3a', size: 20, isRanged: true, isBuilding: true, projectileSpeed: 500, projectileColor: '#ffcc88', targetsBuildingsOnly: true, image: IMG('x-bow') },
+            { id: 'goblin_drill', name: 'Гоблинский бур', emoji: '🔩', cost: 4, rarity: 'Epic', hp: 1000, dmg: 150, speed: 1.5, range: 25, color: '#6a6a6a', size: 19, isRanged: false, targetsBuildingsOnly: true, image: IMG('goblin-drill') },
+
+            // ===== ЛЕГЕНДАРНЫЕ (LEGENDARY) =====
+            { id: 'miner', name: 'Шахтёр', emoji: '⛏️', cost: 3, rarity: 'Legendary', hp: 1210, dmg: 149, speed: 1.2, range: 25, color: '#6a5a4a', size: 17, isRanged: false, image: IMG('miner') },
+            { id: 'princess', name: 'Принцесса', emoji: '👸', cost: 3, rarity: 'Legendary', hp: 385, dmg: 169, speed: 1.0, range: 180, color: '#d84a8a', size: 15, isRanged: true, projectileSpeed: 550, projectileColor: '#ff8ac0', image: IMG('princess') },
+            { id: 'the_log', name: 'Бревно', emoji: '🪵', cost: 2, rarity: 'Legendary', hp: 0, dmg: 240, speed: 0, range: 80, color: '#8a6a3a', size: 16, isRanged: false, isSpell: true, towerDamage: 96, image: IMG('the-log') },
+            { id: 'bandit', name: 'Бандитка', emoji: '🏴‍☠️', cost: 3, rarity: 'Legendary', hp: 906, dmg: 194, speed: 1.5, range: 25, color: '#4a3a3a', size: 17, isRanged: false, image: IMG('bandit') },
+            { id: 'mega_knight', name: 'Мегарыцарь', emoji: '🦸', cost: 7, rarity: 'Legendary', hp: 3993, dmg: 157, speed: 1.0, range: 28, color: '#4a4aff', size: 24, isRanged: false, image: IMG('mega-knight') },
+            { id: 'ram_rider', name: 'Всадница на баране', emoji: '🐏', cost: 5, rarity: 'Legendary', hp: 1697, dmg: 147, speed: 1.4, range: 28, color: '#8a4a6a', size: 20, isRanged: false, targetsBuildingsOnly: true, image: IMG('ram-rider') },
+            { id: 'electro_wizard', name: 'Громовержец', emoji: '⚡', cost: 4, rarity: 'Legendary', hp: 714, dmg: 126, speed: 1.0, range: 130, color: '#4a8aff', size: 17, isRanged: true, projectileSpeed: 450, projectileColor: '#aaddff', image: IMG('electro-wizard') },
+            { id: 'inferno_dragon', name: 'Адский дракон', emoji: '🐉', cost: 4, rarity: 'Legendary', hp: 1295, dmg: 350, speed: 1.0, range: 110, color: '#ff4a2a', size: 19, isRanged: true, projectileSpeed: 400, projectileColor: '#ff8a2a', image: IMG('inferno-dragon') },
+            { id: 'sparky', name: 'Спарки', emoji: '⚡', cost: 6, rarity: 'Legendary', hp: 1451, dmg: 332, speed: 0.6, range: 120, color: '#4a8aff', size: 20, isRanged: true, projectileSpeed: 300, projectileColor: '#aaddff', image: IMG('sparky') },
+            { id: 'phoenix', name: 'Феникс', emoji: '🔥', cost: 4, rarity: 'Legendary', hp: 1052, dmg: 217, speed: 1.2, range: 25, color: '#ff6a2a', size: 18, isRanged: false, image: IMG('phoenix') },
+            { id: 'royal_ghost', name: 'Королевский призрак', emoji: '👻', cost: 3, rarity: 'Legendary', hp: 1210, dmg: 216, speed: 1.3, range: 25, color: '#aaaaaa', size: 18, isRanged: false, image: IMG('royal-ghost') },
+            { id: 'ice_wizard', name: 'Ледяной колдун', emoji: '🧊', cost: 3, rarity: 'Legendary', hp: 688, dmg: 52, speed: 1.0, range: 120, color: '#4ac8ff', size: 17, isRanged: true, projectileSpeed: 400, projectileColor: '#aaddff', image: IMG('ice-wizard') },
+            { id: 'magic_archer', name: 'Магический лучник', emoji: '🏹', cost: 4, rarity: 'Legendary', hp: 529, dmg: 120, speed: 1.0, range: 150, color: '#8a4aff', size: 16, isRanged: true, projectileSpeed: 550, projectileColor: '#cc88ff', image: IMG('magic-archer') },
+            { id: 'lava_hound', name: 'Лавовая гончая', emoji: '🔥', cost: 7, rarity: 'Legendary', hp: 3581, dmg: 40, speed: 0.8, range: 25, color: '#ff4a2a', size: 26, isRanged: false, targetsBuildingsOnly: true, image: IMG('lava-hound') },
+            { id: 'night_witch', name: 'Ночная ведьма', emoji: '🌙', cost: 4, rarity: 'Legendary', hp: 885, dmg: 133, speed: 1.0, range: 120, color: '#4a2a6a', size: 18, isRanged: true, projectileSpeed: 350, projectileColor: '#8a4aff', image: IMG('night-witch') },
+            { id: 'lumberjack', name: 'Лесоруб', emoji: '🪓', cost: 4, rarity: 'Legendary', hp: 1282, dmg: 320, speed: 1.3, range: 25, color: '#8a4a2a', size: 18, isRanged: false, image: IMG('lumberjack') },
+            { id: 'goblin_machine', name: 'Гоблин-машина', emoji: '🤖', cost: 5, rarity: 'Legendary', hp: 2304, dmg: 176, speed: 1.0, range: 100, color: '#4a7a3a', size: 20, isRanged: true, projectileSpeed: 400, projectileColor: '#aaffaa', image: IMG('goblin-machine') },
+            { id: 'mother_witch', name: 'Ведьмина бабушка', emoji: '🧙‍♀️', cost: 4, rarity: 'Legendary', hp: 885, dmg: 133, speed: 0.9, range: 120, color: '#8a2a6a', size: 18, isRanged: true, projectileSpeed: 300, projectileColor: '#ff4aff', image: IMG('mother-witch') },
+            { id: 'fisherman', name: 'Рыбак', emoji: '🎣', cost: 3, rarity: 'Legendary', hp: 870, dmg: 149, speed: 1.0, range: 90, color: '#4a6a8a', size: 17, isRanged: false, image: IMG('fisherman') },
+            { id: 'graveyard', name: 'Кладбище', emoji: '⚰️', cost: 5, rarity: 'Legendary', hp: 0, dmg: 0, speed: 0, range: 80, color: '#6a6a6a', size: 18, isRanged: false, isSpell: true, image: IMG('graveyard') },
+
+            // ===== ЧЕМПИОНЫ (CHAMPION) =====
+            { id: 'golden_knight', name: 'Золотой рыцарь', emoji: '🥇', cost: 4, rarity: 'Champion', hp: 1799, dmg: 178, speed: 1.2, range: 28, color: '#ffd700', size: 19, isRanged: false, image: IMG('golden-knight') },
+            { id: 'skeleton_king', name: 'Король скелетов', emoji: '💀', cost: 4, rarity: 'Champion', hp: 2298, dmg: 127, speed: 1.0, range: 28, color: '#8a8a8a', size: 22, isRanged: false, image: IMG('skeleton-king') },
+            { id: 'archer_queen', name: 'Королева лучниц', emoji: '🏹', cost: 5, rarity: 'Champion', hp: 1000, dmg: 187, speed: 1.1, range: 140, color: '#d84a8a', size: 18, isRanged: true, projectileSpeed: 550, projectileColor: '#ff8ac0', image: IMG('archer-queen') },
+            { id: 'mighty_miner', name: 'Могучий шахтёр', emoji: '⛏️', cost: 4, rarity: 'Champion', hp: 2250, dmg: 100, speed: 1.2, range: 25, color: '#6a5a4a', size: 19, isRanged: false, image: IMG('mighty-miner') },
+            { id: 'monk', name: 'Монах', emoji: '🧘', cost: 5, rarity: 'Champion', hp: 2214, dmg: 175, speed: 0.9, range: 28, color: '#8a6a4a', size: 20, isRanged: false, image: IMG('monk') },
+            { id: 'little_prince', name: 'Маленький принц', emoji: '👑', cost: 3, rarity: 'Champion', hp: 698, dmg: 83, speed: 1.0, range: 120, color: '#d84a8a', size: 16, isRanged: true, projectileSpeed: 500, projectileColor: '#ff8ac0', image: IMG('little-prince') },
+            { id: 'goblinstein', name: 'Гоблинштейн', emoji: '🧟', cost: 5, rarity: 'Champion', hp: 721, dmg: 51, speed: 1.0, range: 120, color: '#4a7a3a', size: 17, isRanged: true, projectileSpeed: 400, projectileColor: '#aaffaa', targetsBuildingsOnly: true, image: IMG('goblinstein') },
+            { id: 'boss_bandit', name: 'Главная бандитка', emoji: '🏴‍☠️', cost: 1, rarity: 'Champion', hp: 2624, dmg: 223, speed: 1.3, range: 25, color: '#4a3a3a', size: 21, isRanged: false, image: IMG('boss-bandit') },
+
+            // ===== БАШНИ-ВОЙСКА (TOWER TROOPS) =====
+            { id: 'tower_princess', name: 'Принцесса-башня', emoji: '🏰', cost: 0, rarity: 'Common', hp: 3052, dmg: 136, speed: 0, range: 150, color: '#4a8fc9', size: 22, isRanged: true, isTowerTroop: true, projectileSpeed: 500, projectileColor: '#aaccff', image: IMG('tower-princess') },
+            { id: 'baby_goblins', name: 'Малые гоблины', emoji: '👺', cost: 0, rarity: 'Common', hp: 2000, dmg: 100, speed: 0, range: 120, color: '#4a7a3a', size: 20, isRanged: true, isTowerTroop: true, projectileSpeed: 450, projectileColor: '#aaffaa', image: IMG('baby-goblins') },
+            { id: 'cannoneer', name: 'Пушкарь', emoji: '💣', cost: 0, rarity: 'Epic', hp: 2616, dmg: 152, speed: 0, range: 150, color: '#6a6a6a', size: 22, isRanged: true, isTowerTroop: true, projectileSpeed: 400, projectileColor: '#aaaaaa', image: IMG('cannoneer') },
+            { id: 'dagger_duchess', name: 'Герцогиня-кинжальщица', emoji: '🗡️', cost: 0, rarity: 'Legendary', hp: 2768, dmg: 214, speed: 0, range: 150, color: '#8a4a6a', size: 22, isRanged: true, isTowerTroop: true, projectileSpeed: 500, projectileColor: '#ff8ac0', image: IMG('dagger-duchess') },
+            { id: 'royal_chef', name: 'Королевский повар', emoji: '👨‍🍳', cost: 0, rarity: 'Legendary', hp: 2921, dmg: 109, speed: 0, range: 150, color: '#d8a83a', size: 22, isRanged: true, isTowerTroop: true, projectileSpeed: 400, projectileColor: '#ffd966', image: IMG('royal-chef') }
+        ];
+
+        // ============ СВОЙСТВА ЮНИТОВ ============
+        const FLYING_IDS = new Set([
+            'minion', 'minion_horde', 'mega_minion', 'bats',
+            'baby_dragon', 'inferno_dragon', 'electro_dragon', 'skeleton_dragons',
+            'phoenix', 'lava_hound', 'balloon'
+        ]);
+        const SPLASH_IDS = new Set([
+            'valkyrie', 'bomber', 'wizard', 'baby_dragon', 'witch', 'executioner',
+            'bowler', 'dark_prince', 'mega_knight', 'sparky', 'firecracker',
+            'magic_archer', 'ice_wizard', 'electro_dragon', 'skeleton_dragons',
+            'goblin_demolisher', 'cannon_cart'
+        ]);
+        const GROUND_ONLY_RANGED = new Set([
+            'bomber', 'goblin_demolisher', 'bowler', 'cannon', 'mortar',
+            'bomb_tower', 'inferno_tower'
+        ]);
+
+        ALL_CARDS.forEach(card => {
+            if (FLYING_IDS.has(card.id)) card.isFlying = true;
+            if (SPLASH_IDS.has(card.id)) card.isSplash = true;
+            if (card.isSpell) card.canTargetAir = true;
+            else if (card.isFlying) card.canTargetAir = true;
+            else if (card.isTowerTroop) card.canTargetAir = true;
+            else if (card.isRanged && !GROUND_ONLY_RANGED.has(card.id)) card.canTargetAir = true;
+            else card.canTargetAir = false;
+        });
+
+        const UPGRADEABLE_CARDS = ALL_CARDS.filter(c => !c.isTowerTroop);
+
+        // ============ ПРЕДЗАГРУЗКА ИЗОБРАЖЕНИЙ ============
+        const imageCache = {};
+        function preloadCardImages() {
+            ALL_CARDS.forEach(card => {
+                if (!card.image) return;
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.src = card.image;
+                imageCache[card.id] = img;
+            });
+        }
+
+        const RARITY_MIN_LEVEL = { 'Common': 1, 'Rare': 3, 'Epic': 6, 'Legendary': 9, 'Champion': 11 };
+        function getLevelMultiplier(level, rarity) { return 1 + (level - RARITY_MIN_LEVEL[rarity]) * 0.1; }
+        function getUpgradeCoinCost(level, rarity) {
+            const baseCost = { 'Common': 5, 'Rare': 20, 'Epic': 100, 'Legendary': 400, 'Champion': 1000 };
+            return Math.floor(baseCost[rarity] * Math.pow(1.5, level - RARITY_MIN_LEVEL[rarity]));
+        }
+        function getUpgradeCardCost(level, rarity) { return Math.floor(2 * Math.pow(1.4, level - RARITY_MIN_LEVEL[rarity])); }
+
+        const RP_MAX_LEVEL = 50;
+        const RP_CROWNS_PER_LEVEL = 10;
+        let royalPassCrowns = 0;
+        let royalPassClaimed = {};
+
+        const CHEST_TYPES = [
+            { id: 'silver', name: 'Серебряный', emoji: '🥈', coins: 100, gems: 5, cards: 3, minTrophies: 0 },
+            { id: 'gold', name: 'Золотой', emoji: '🥇', coins: 300, gems: 15, cards: 8, minTrophies: 0 },
+            { id: 'magic', name: 'Магический', emoji: '🔮', coins: 500, gems: 30, cards: 15, minTrophies: 100 },
+            { id: 'giant', name: 'Гигантский', emoji: '📦', coins: 1000, gems: 50, cards: 25, minTrophies: 300 },
+            { id: 'legendary', name: 'Легендарный', emoji: '👑', coins: 2000, gems: 100, cards: 40, minTrophies: 600 }
+        ];
+
+        const RP_REWARDS = [];
+        function initRoyalPassRewards() {
+            for (let level = 1; level <= RP_MAX_LEVEL; level++) {
+                let reward;
+                if (level === RP_MAX_LEVEL) reward = { type: 'gems', amount: 500, label: '500 гемов', emoji: '💎' };
+                else if (level === 25) reward = { type: 'gems', amount: 200, label: '200 гемов', emoji: '💎' };
+                else if (level % 10 === 0) reward = { type: 'chest', chestType: 'giant', label: 'Гигантский сундук', emoji: '📦' };
+                else if (level % 5 === 0) {
+                    const chestTypes = ['silver', 'gold', 'magic', 'giant', 'legendary'];
+                    const idx = Math.min(chestTypes.length - 1, Math.floor(level / 5) - 1);
+                    const ctId = chestTypes[idx];
+                    const ct = CHEST_TYPES.find(c => c.id === ctId);
+                    reward = { type: 'chest', chestType: ctId, label: ct.name + ' сундук', emoji: ct.emoji };
+                } else {
+                    const mod = level % 3;
+                    if (mod === 1) reward = { type: 'coins', amount: 50 + level * 15, label: (50 + level * 15) + ' монет', emoji: '🪙' };
+                    else if (mod === 2) reward = { type: 'cards', amount: 2 + Math.floor(level / 4), label: (2 + Math.floor(level / 4)) + ' карт', emoji: '🃏' };
+                    else reward = { type: 'gems', amount: 3 + Math.floor(level / 6), label: (3 + Math.floor(level / 6)) + ' гемов', emoji: '💎' };
+                }
+                RP_REWARDS.push(reward);
+            }
+        }
+
+        const CHEST_SLOTS = 4;
+        let chests = [null, null, null, null];
+
+        function pickChestForTrophies(t) {
+            const available = CHEST_TYPES.filter(c => t >= c.minTrophies);
+            const weights = { 'silver': 50, 'gold': 30, 'magic': 12, 'giant': 6, 'legendary': 2 };
+            let total = 0;
+            const weighted = available.map(c => { const w = weights[c.id] || 1; total += w; return { chest: c, weight: w }; });
+            let roll = Math.random() * total;
+            for (const item of weighted) { roll -= item.weight; if (roll <= 0) return item.chest; }
+            return available[0];
+        }
+        function addChestForVictory() {
+            const emptyIdx = chests.findIndex(c => c === null);
+            if (emptyIdx === -1) return null;
+            const chestType = pickChestForTrophies(trophies);
+            const chest = { ...chestType, instanceId: Date.now() + Math.random() };
+            chests[emptyIdx] = chest;
+            return { chest, slotIndex: emptyIdx };
+        }
+
+        function getRPLevelFromCrowns(crowns) { return Math.min(RP_MAX_LEVEL, Math.floor(crowns / RP_CROWNS_PER_LEVEL)); }
+        function hasClaimableRewards() {
+            const currentLevel = getRPLevelFromCrowns(royalPassCrowns);
+            for (let lvl = 1; lvl <= currentLevel; lvl++) { if (!royalPassClaimed[lvl]) return true; }
+            return false;
+        }
+
+        let trophies = 0, coins = 1000, gems = 50;
+        let cardProgress = {};
+        let currentUser = null;
+
+        // ============ РЕКЛАМА ЗА МОНЕТЫ ============
+        const AD_DURATION = 15;
+        const AD_COOLDOWN = 60;
+        const AD_REWARD = 100;
+        let adCooldownUntil = 0;
+        let adTimerInterval = null;
+
+        const NUM_DECKS = 5;
+        const DEFAULT_DECK_NAMES = ['Колода 1', 'Колода 2', 'Колода 3', 'Колода 4', 'Колода 5'];
+        const STARTER_DECKS = [
+            ['knight', 'archer', 'giant', 'minion', 'goblin', 'fireball', 'skeletons', 'valkyrie'],
+            ['hog_rider', 'musketeer', 'skeletons', 'mini_pekka', 'fireball', 'the_log', 'archer', 'valkyrie'],
+            ['pekka', 'wizard', 'minion', 'goblin', 'witch', 'bandit', 'baby_dragon', 'skeletons'],
+            [],
+            []
+        ];
+        let decks = [];
+        let activeDeckIndex = 0;
+        let clipboardDeck = null;
+
+        function getActiveDeck() { return decks[activeDeckIndex]; }
+        function setActiveDeck(arr) { decks[activeDeckIndex] = arr; }
+
+        let playerHand = [], playerQueue = [], enemyDeck = [], enemyHand = [], enemyQueue = [];
+        let elixir = 10, enemyElixir = 5;
+        const MAX_ELIXIR = 10;
+        let elixirRegenTimer = 0, enemyElixirRegenTimer = 0;
+        const ELIXIR_REGEN_INTERVAL = 2.8;
+
+        let units = [], projectiles = [], activeSpells = [];
+        let selectedCardIndex = 0;
+        let playerKing, enemyKing, playerLeftTower, playerRightTower, enemyLeftTower, enemyRightTower;
+        let towers = [];
+        let lastTimestamp = 0, gameOver = false, enemyAITimer = 0, battleActive = false;
+        let upgradeTargetCardId = null, currentChestSlotIndex = -1;
+        let lastArenaId = 1;
+
+        // ============ АККАУНТЫ ============
+        function getAccounts() {
+            try { return JSON.parse(localStorage.getItem(AUTH_KEY) || '{}'); } catch (e) { return {}; }
+        }
+        function saveAccounts(accounts) { localStorage.setItem(AUTH_KEY, JSON.stringify(accounts)); }
+
+        function hashPassword(pwd) {
+            let hash = 0;
+            for (let i = 0; i < pwd.length; i++) { const char = pwd.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash |= 0; }
+            return hash.toString(36);
+        }
+
+        function saveGame() {
+            if (!currentUser) return;
+            try {
+                const saveData = {
+                    trophies, coins, gems,
+                    royalPassCrowns, royalPassClaimed,
+                    cardProgress,
+                    decks, activeDeckIndex,
+                    adCooldownUntil,
+                    chests: chests.map(c => c ? { id: c.id, name: c.name, emoji: c.emoji, coins: c.coins, gems: c.gems, cards: c.cards, minTrophies: c.minTrophies, instanceId: c.instanceId } : null)
+                };
+                const accounts = getAccounts();
+                accounts[currentUser] = accounts[currentUser] || {};
+                accounts[currentUser].save = saveData;
+                saveAccounts(accounts);
+            } catch (e) { console.warn('Save failed:', e); }
+        }
+
+        function loadGame() {
+            if (!currentUser) return false;
+            try {
+                const accounts = getAccounts();
+                const data = accounts[currentUser]?.save;
+                if (!data) return false;
+                if (typeof data.trophies === 'number') trophies = data.trophies;
+                if (typeof data.coins === 'number') coins = data.coins;
+                if (typeof data.gems === 'number') gems = data.gems;
+                if (typeof data.royalPassCrowns === 'number') royalPassCrowns = data.royalPassCrowns;
+                if (data.royalPassClaimed && typeof data.royalPassClaimed === 'object') royalPassClaimed = data.royalPassClaimed;
+                if (data.cardProgress && typeof data.cardProgress === 'object') cardProgress = data.cardProgress;
+                if (Array.isArray(data.decks)) decks = data.decks;
+                if (typeof data.activeDeckIndex === 'number') activeDeckIndex = data.activeDeckIndex;
+                if (typeof data.adCooldownUntil === 'number') adCooldownUntil = data.adCooldownUntil;
+                if (Array.isArray(data.chests)) {
+                    chests = data.chests.map(c => {
+                        if (!c) return null;
+                        const full = CHEST_TYPES.find(t => t.id === c.id) || c;
+                        return { ...full, instanceId: c.instanceId || Date.now() + Math.random() };
+                    });
+                }
+                UPGRADEABLE_CARDS.forEach(card => {
+                    if (!cardProgress[card.id]) cardProgress[card.id] = { level: RARITY_MIN_LEVEL[card.rarity], cards: 10 };
+                });
+                return true;
+            } catch (e) { console.warn('Load failed:', e); return false; }
+        }
+
+        window.addEventListener('beforeunload', saveGame);
+        setInterval(saveGame, 10000);
+
+        function initDecks() { if (!decks || decks.length === 0) decks = STARTER_DECKS.map(d => [...d]); }
+        function initCardProgress() {
+            UPGRADEABLE_CARDS.forEach(card => {
+                if (!cardProgress[card.id]) cardProgress[card.id] = { level: RARITY_MIN_LEVEL[card.rarity], cards: 10 };
+            });
+        }
+
+        function getCardStatsWithLevel(cardId) {
+            const card = ALL_CARDS.find(c => c.id === cardId);
+            const progress = cardProgress[cardId];
+            if (!card || !progress) return null;
+            const mult = getLevelMultiplier(progress.level, card.rarity);
+            return { ...card, hp: Math.floor(card.hp * mult), dmg: Math.floor(card.dmg * mult), towerDamage: card.towerDamage ? Math.floor(card.towerDamage * mult) : undefined, level: progress.level };
+        }
+
+        function updateTopBar() {
+            document.getElementById('topTrophyValue').textContent = trophies;
+            document.getElementById('topCoinValue').textContent = coins;
+            document.getElementById('topGemValue').textContent = gems;
+            document.getElementById('battleTrophyValue').textContent = trophies;
+            document.getElementById('topPlayerName').textContent = currentUser || 'Король';
+            const filled = chests.filter(c => c !== null).length;
+            document.getElementById('chestCounter').textContent = `${filled} / ${CHEST_SLOTS}`;
+            const arena = getCurrentArena();
+            document.getElementById('topArenaBadge').textContent = `${arena.icon} ${arena.name}`;
+            if (arena.id > lastArenaId) {
+                lastArenaId = arena.id;
+                showToast(`🎉 Новая арена: ${arena.name}!`);
+            }
+        }
+
+        const toastEl = document.getElementById('toast');
+        let toastTimeout;
+        function showToast(text) {
+            clearTimeout(toastTimeout);
+            toastEl.textContent = text;
+            toastEl.classList.add('show');
+            toastTimeout = setTimeout(() => toastEl.classList.remove('show'), 2200);
+        }
+
+        // ============ ЛОГИКА РЕКЛАМЫ ============
+        function isAdOnCooldown() { return Date.now() < adCooldownUntil; }
+        function getAdCooldownRemaining() { return Math.max(0, Math.ceil((adCooldownUntil - Date.now()) / 1000)); }
+
+        function updateAdButton() {
+            const btn = document.getElementById('buyFreeBtn');
+            const costEl = document.getElementById('adCostLabel');
+            if (!btn || !costEl) return;
+            if (isAdOnCooldown()) {
+                const sec = getAdCooldownRemaining();
+                btn.disabled = true;
+                btn.textContent = `⏳ ${sec}с`;
+                costEl.textContent = 'ПЕРЕЗАРЯДКА';
+            } else {
+                btn.disabled = false;
+                btn.textContent = 'Смотреть';
+                costEl.textContent = '15 сек 📺';
+            }
+        }
+        setInterval(updateAdButton, 1000);
+
+        function startAd() {
+            if (isAdOnCooldown()) { showToast(`⏳ Подожди ${getAdCooldownRemaining()} сек`); return; }
+            if (adTimerInterval) return;
+            let timeLeft = AD_DURATION;
+            const timerEl = document.getElementById('adTimer');
+            const skipBtn = document.getElementById('adSkipBtn');
+            timerEl.textContent = timeLeft;
+            skipBtn.disabled = true;
+            skipBtn.textContent = `Подожди ${timeLeft}с...`;
+            document.getElementById('adModal').classList.add('active');
+
+            adTimerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = Math.max(0, timeLeft);
+                if (timeLeft > 0) { skipBtn.textContent = `Подожди ${timeLeft}с...`; }
+                else { skipBtn.textContent = 'ЗАБРАТЬ НАГРАДУ'; skipBtn.disabled = false; clearInterval(adTimerInterval); adTimerInterval = null; }
+            }, 1000);
+        }
+
+        function claimAdReward() {
+            if (adTimerInterval) return;
+            coins += AD_REWARD;
+            adCooldownUntil = Date.now() + AD_COOLDOWN * 1000;
+            saveGame(); updateTopBar(); updateAdButton(); closeAdModal();
+            showToast(`🪙 +${AD_REWARD} монет!`);
+        }
+
+        function closeAdModal() {
+            document.getElementById('adModal').classList.remove('active');
+            if (adTimerInterval) { clearInterval(adTimerInterval); adTimerInterval = null; }
+        }
+
+        // ============ НАВИГАЦИЯ ============
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                if (battleActive && tab !== 'battle') { showToast('⚠️ Сначала заверши бой!'); return; }
+                switchTab(tab);
+            });
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add('active');
+            document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            if (tab === 'collection') renderCollection();
+            if (tab === 'battle') renderBattleLobby();
+            document.getElementById('contentArea').scrollTop = 0;
+        }
+
+        function renderRoyalPass() {
+            const currentLevel = getRPLevelFromCrowns(royalPassCrowns);
+            const crownsInLevel = royalPassCrowns - currentLevel * RP_CROWNS_PER_LEVEL;
+            const percent = currentLevel >= RP_MAX_LEVEL ? 100 : (crownsInLevel / RP_CROWNS_PER_LEVEL) * 100;
+            document.getElementById('rpLevel').textContent = currentLevel;
+            document.getElementById('rpCrowns').textContent = currentLevel >= RP_MAX_LEVEL ? '—' : crownsInLevel;
+            document.getElementById('rpNeeded').textContent = currentLevel >= RP_MAX_LEVEL ? '—' : RP_CROWNS_PER_LEVEL;
+            document.getElementById('rpProgressFill').style.width = percent + '%';
+            document.getElementById('royalPassBadge').textContent = `${currentLevel} / ${RP_MAX_LEVEL}`;
+            const hasClaimable = hasClaimableRewards();
+            document.getElementById('rpNewBadge').innerHTML = hasClaimable ? '<div class="rp-badge-new">NEW</div>' : '';
+        }
+
+        function openRoyalPassModal() {
+            document.getElementById('rpModalCrowns').textContent = royalPassCrowns;
+            document.getElementById('rpModalLevel').textContent = getRPLevelFromCrowns(royalPassCrowns);
+            renderRoyalPassList();
+            document.getElementById('royalPassModal').classList.add('active');
+        }
+        function closeRoyalPassModal() { document.getElementById('royalPassModal').classList.remove('active'); }
+
+        function renderRoyalPassList() {
+            const currentLevel = getRPLevelFromCrowns(royalPassCrowns);
+            const list = document.getElementById('rpList');
+            list.innerHTML = '';
+            for (let lvl = 1; lvl <= RP_MAX_LEVEL; lvl++) {
+                const reward = RP_REWARDS[lvl - 1];
+                const isReached = lvl <= currentLevel;
+                const isClaimed = !!royalPassClaimed[lvl];
+                const canClaim = isReached && !isClaimed;
+                const item = document.createElement('div');
+                item.className = 'rp-level-item';
+                if (isClaimed) item.classList.add('claimed');
+                else if (isReached) item.classList.add('reached');
+                else item.classList.add('future');
+                let statusHtml = '';
+                if (isClaimed) statusHtml = '<div class="rp-status-icon">✅</div>';
+                else if (canClaim) statusHtml = `<button class="rp-claim-btn" data-lvl="${lvl}">Забрать</button>`;
+                else statusHtml = '<div class="rp-status-icon">🔒</div>';
+                let typeLabel = '';
+                if (reward.type === 'coins') typeLabel = 'Монеты';
+                else if (reward.type === 'gems') typeLabel = 'Самоцветы';
+                else if (reward.type === 'cards') typeLabel = 'Карты';
+                else if (reward.type === 'chest') typeLabel = 'Сундук';
+                item.innerHTML = `
+                    <div class="rp-level-num">${lvl}</div>
+                    <div class="rp-reward-icon">${reward.emoji}</div>
+                    <div class="rp-reward-info">
+                        <div class="rp-reward-label">${reward.label}</div>
+                        <div class="rp-reward-type">${typeLabel}</div>
+                    </div>
+                    ${statusHtml}
+                `;
+                list.appendChild(item);
+            }
+            list.querySelectorAll('.rp-claim-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => { claimRoyalPassReward(parseInt(e.target.dataset.lvl)); });
+            });
+        }
+
+        function claimRoyalPassReward(lvl) {
+            if (lvl < 1 || lvl > RP_MAX_LEVEL) return;
+            if (royalPassClaimed[lvl]) return;
+            const currentLevel = getRPLevelFromCrowns(royalPassCrowns);
+            if (lvl > currentLevel) return;
+            const reward = RP_REWARDS[lvl - 1];
+            applyRoyalPassReward(reward);
+            royalPassClaimed[lvl] = true;
+            saveGame();
+            updateTopBar(); renderRoyalPass(); renderRoyalPassList(); renderChests();
+            showToast(`👑 Получено: ${reward.label}!`);
+        }
+
+        function applyRoyalPassReward(reward) {
+            if (reward.type === 'coins') { coins += reward.amount; }
+            else if (reward.type === 'gems') { gems += reward.amount; }
+            else if (reward.type === 'cards') {
+                for (let i = 0; i < reward.amount; i++) {
+                    const r = UPGRADEABLE_CARDS[Math.floor(Math.random() * UPGRADEABLE_CARDS.length)];
+                    cardProgress[r.id].cards += 1;
+                }
+            } else if (reward.type === 'chest') {
+                const ct = CHEST_TYPES.find(c => c.id === reward.chestType);
+                if (ct) {
+                    coins += ct.coins; gems += ct.gems;
+                    for (let i = 0; i < ct.cards; i++) {
+                        const r = UPGRADEABLE_CARDS[Math.floor(Math.random() * UPGRADEABLE_CARDS.length)];
+                        cardProgress[r.id].cards += 1;
+                    }
+                }
+            }
+        }
+
+        function addCrownsForVictory() {
+            let enemyTowersDestroyed = 0, kingDestroyed = false;
+            for (const t of towers) {
+                if (t.team === 'enemy' && t.obj.alive === false) {
+                    enemyTowersDestroyed++;
+                    if (t.isKing) kingDestroyed = true;
+                }
+            }
+            let earnedCrowns = 0;
+            if (kingDestroyed || enemyTowersDestroyed >= 3) earnedCrowns = 8;
+            else if (enemyTowersDestroyed === 2) earnedCrowns = 4;
+            else if (enemyTowersDestroyed === 1) earnedCrowns = 2;
+            royalPassCrowns += earnedCrowns;
+            const newLevel = getRPLevelFromCrowns(royalPassCrowns);
+            const oldLevel = getRPLevelFromCrowns(royalPassCrowns - earnedCrowns);
+            return { earnedCrowns, towersDestroyed: enemyTowersDestroyed, kingDestroyed, leveledUp: newLevel > oldLevel, newLevel };
+        }
+
+        function renderArenaCenter() {
+            const arena = getCurrentArena();
+            document.getElementById('arenaCenterEmoji').textContent = arena.icon;
+            document.getElementById('arenaCenterName').textContent = arena.name;
+            document.getElementById('arenaCenterTrophies').textContent = trophies;
+        }
+
+        function openGloryModal() {
+            const currentArena = getCurrentArena();
+            const path = document.getElementById('gloryPath');
+            path.innerHTML = '';
+            const sortedArenas = [...ARENAS].sort((a, b) => b.id - a.id);
+            sortedArenas.forEach((arena, index) => {
+                const isUnlocked = trophies >= arena.req;
+                const isCurrent = arena.id === currentArena.id;
+                const item = document.createElement('div');
+                item.className = 'glory-item' + (isUnlocked ? ' unlocked' : ' locked') + (isCurrent ? ' current' : '');
+                item.innerHTML = `
+                    <div class="glory-item-icon" style="background: linear-gradient(180deg, ${arena.color1}, ${arena.color2});">
+                        ${arena.icon}${!isUnlocked ? '<span class="lock-mark">🔒</span>' : ''}
+                    </div>
+                    <div class="glory-item-info">
+                        <div class="glory-item-name">${arena.name}</div>
+                        <div class="glory-item-req">${isCurrent ? '✓ ТЕКУЩАЯ АРЕНА' : (isUnlocked ? '✓ Открыта' : `${arena.req} 🏆 кубков`)}</div>
+                    </div>
+                    <div class="glory-item-status">${isCurrent ? '🌟' : (isUnlocked ? '✅' : '🔒')}</div>
+                `;
+                path.appendChild(item);
+                if (index < sortedArenas.length - 1) {
+                    const conn = document.createElement('div');
+                    conn.className = 'glory-connector' + (isUnlocked ? ' unlocked' : '');
+                    path.appendChild(conn);
+                }
+            });
+            document.getElementById('gloryModal').classList.add('active');
+        }
+        function closeGloryModal() { document.getElementById('gloryModal').classList.remove('active'); }
+
+        function renderChests() {
+            updateTopBar();
+            const row = document.getElementById('chestRow');
+            if (!row) return;
+            row.innerHTML = '';
+            for (let i = 0; i < CHEST_SLOTS; i++) {
+                const chest = chests[i];
+                const slot = document.createElement('div');
+                if (chest) {
+                    slot.className = 'chest-slot filled';
+                    slot.innerHTML = `<div class="chest-badge">!</div><div class="chest-emoji">${chest.emoji}</div><div class="chest-label">${chest.name}</div>`;
+                    slot.addEventListener('click', () => openChestModal(i));
+                } else {
+                    slot.className = 'chest-slot empty';
+                    slot.innerHTML = `<div class="chest-emoji">🎁</div><div class="chest-label">ПУСТО</div>`;
+                }
+                row.appendChild(slot);
+            }
+        }
+
+        function openChestModal(slotIndex) {
+            const chest = chests[slotIndex];
+            if (!chest) return;
+            currentChestSlotIndex = slotIndex;
+            document.getElementById('chestModalEmoji').textContent = chest.emoji;
+            document.getElementById('chestModalTitle').textContent = chest.name + ' сундук';
+            document.getElementById('chestRewards').innerHTML = `
+                <div class="reward-row"><span class="reward-label">🪙 Монеты</span><span class="reward-value">+${chest.coins}</span></div>
+                <div class="reward-row"><span class="reward-label">💎 Гемы</span><span class="reward-value gem">+${chest.gems}</span></div>
+                <div class="reward-row"><span class="reward-label">🃏 Карты</span><span class="reward-value card">+${chest.cards} копий</span></div>`;
+            document.getElementById('chestModal').classList.add('active');
+        }
+
+        function openChest() {
+            if (currentChestSlotIndex === -1) return;
+            const chest = chests[currentChestSlotIndex];
+            if (!chest) { closeChestModal(); return; }
+            coins += chest.coins; gems += chest.gems;
+            for (let i = 0; i < chest.cards; i++) { const r = UPGRADEABLE_CARDS[Math.floor(Math.random() * UPGRADEABLE_CARDS.length)]; cardProgress[r.id].cards += 1; }
+            chests[currentChestSlotIndex] = null;
+            currentChestSlotIndex = -1;
+            saveGame();
+            updateTopBar(); renderChests(); closeChestModal();
+            showToast(`🎉 ${chest.name} открыт!`);
+        }
+        function closeChestModal() { document.getElementById('chestModal').classList.remove('active'); currentChestSlotIndex = -1; }
+
+        function renderDeckSelector() {
+            const selector = document.getElementById('deckSelector');
+            selector.innerHTML = '';
+            for (let i = 0; i < NUM_DECKS; i++) {
+                const deck = decks[i], isActive = i === activeDeckIndex, isComplete = deck.length === 8;
+                const tab = document.createElement('button');
+                tab.className = 'deck-tab' + (isActive ? ' active' : '');
+                tab.innerHTML = `<div class="deck-num">${i + 1}</div><div class="deck-name">${deck.length}/8</div><div class="deck-status ${isComplete ? '' : 'incomplete'}">${isComplete ? '✓' : '!'}</div>`;
+                tab.addEventListener('click', () => { activeDeckIndex = i; saveGame(); renderCollection(); renderBattleLobby(); });
+                selector.appendChild(tab);
+            }
+        }
+
+        function renderCollection() {
+            updateTopBar(); renderDeckSelector();
+            const deck = getActiveDeck();
+            document.getElementById('currentDeckLabel').textContent = DEFAULT_DECK_NAMES[activeDeckIndex];
+            const deckSlots = document.getElementById('deckSlots');
+            deckSlots.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                const slot = document.createElement('div'), cardId = deck[i];
+                if (cardId) {
+                    const card = ALL_CARDS.find(c => c.id === cardId), progress = cardProgress[cardId];
+                    slot.className = 'deck-slot filled';
+                    slot.innerHTML = `<div class="slot-level">${progress ? progress.level : '?'}</div><img class="slot-emoji" src="${card.image}" alt="${card.name}"><div class="slot-name">${card.name}</div><div class="slot-cost">${card.cost}</div>`;
+                    slot.addEventListener('click', (e) => { e.stopPropagation(); deck.splice(i, 1); saveGame(); renderCollection(); renderBattleLobby(); });
+                } else { slot.className = 'deck-slot'; slot.innerHTML = `<div style="font-size:18px;">+</div><div>ПУСТО</div>`; }
+                deckSlots.appendChild(slot);
+            }
+            const deckCounter = document.getElementById('deckCounter');
+            deckCounter.textContent = `${deck.length} / 8`;
+            if (deck.length === 8) deckCounter.classList.add('full'); else deckCounter.classList.remove('full');
+
+            const cardPool = document.getElementById('cardPool');
+            cardPool.innerHTML = '';
+            UPGRADEABLE_CARDS.forEach(card => {
+                const inDeck = deck.includes(card.id), progress = cardProgress[card.id];
+                if (!progress) return;
+                const poolCard = document.createElement('div');
+                poolCard.className = 'pool-card' + (inDeck ? ' in-deck' : '');
+                let rarityClass = 'rarity-common';
+                if (card.rarity === 'Rare') rarityClass = 'rarity-rare';
+                else if (card.rarity === 'Epic') rarityClass = 'rarity-epic';
+                else if (card.rarity === 'Legendary') rarityClass = 'rarity-legendary';
+                else if (card.rarity === 'Champion') rarityClass = 'rarity-champion';
+                poolCard.innerHTML = `<div class="pool-level">${progress.level}</div><div class="rarity-dot ${rarityClass}"></div><img class="pool-emoji" src="${card.image}" alt="${card.name}"><div class="pool-name">${card.name}</div><div class="pool-cost">${card.cost}</div>${inDeck ? '<div class="in-deck-mark">✓</div>' : ''}`;
+                poolCard.addEventListener('click', () => openUpgradeModal(card.id));
+                cardPool.appendChild(poolCard);
+            });
+        }
+
+        function renderBattleLobby() {
+            updateTopBar(); renderChests(); renderArenaCenter(); renderRoyalPass();
+            const deck = getActiveDeck();
+            const battleBtn = document.getElementById('battleBtn'), battleHint = document.getElementById('battleHint'), battleDeckName = document.getElementById('battleDeckName');
+            battleDeckName.textContent = DEFAULT_DECK_NAMES[activeDeckIndex];
+            if (deck.length === 8) { battleBtn.disabled = false; battleHint.textContent = '✓ Колода готова к бою!'; battleHint.style.color = '#4adf4a'; }
+            else { battleBtn.disabled = true; battleHint.textContent = `Собери ровно 8 карт (сейчас: ${deck.length})`; battleHint.style.color = '#e74c3c'; }
+            document.getElementById('battleLobbySection').classList.remove('hidden');
+            document.getElementById('battleArenaSection').classList.add('hidden');
+            battleActive = false;
+        }
+
+        function openUpgradeModal(cardId) {
+            const card = ALL_CARDS.find(c => c.id === cardId), progress = cardProgress[cardId];
+            if (!card || !progress) return;
+            upgradeTargetCardId = cardId;
+            const deck = getActiveDeck(), currentLevel = progress.level, isMax = currentLevel >= MAX_LEVEL, nextLevel = isMax ? currentLevel : currentLevel + 1, inDeck = deck.includes(cardId);
+            document.getElementById('modalEmoji').src = card.image;
+            document.getElementById('modalEmoji').alt = card.name;
+            document.getElementById('modalName').textContent = card.name;
+            const rarityLabels = { 'Common': 'ОБЫЧНАЯ', 'Rare': 'РЕДКАЯ', 'Epic': 'ЭПИЧЕСКАЯ', 'Legendary': 'ЛЕГЕНДАРНАЯ', 'Champion': 'ЧЕМПИОН' };
+            const rarityLabel = document.getElementById('modalRarity');
+            rarityLabel.textContent = rarityLabels[card.rarity];
+            rarityLabel.className = 'modal-card-rarity rarity-label-' + card.rarity.toLowerCase();
+            document.getElementById('inDeckBadgeWrapper').innerHTML = inDeck ? `<div class="in-deck-badge">✓ В КОЛОДЕ ${activeDeckIndex + 1}</div>` : '';
+            document.getElementById('modalLevelCurrent').textContent = currentLevel;
+            document.getElementById('modalLevelNext').textContent = isMax ? 'MAX' : nextLevel;
+
+            const currentStats = getCardStatsWithLevel(cardId);
+            const nextStats = isMax ? currentStats : (() => { const mult = getLevelMultiplier(nextLevel, card.rarity); return { hp: Math.floor(card.hp * mult), dmg: Math.floor(card.dmg * mult), towerDamage: card.towerDamage ? Math.floor(card.towerDamage * mult) : undefined }; })();
+
+            let statsHtml = '';
+            if (currentStats.hp > 0) statsHtml += `<div class="stat-row"><span class="stat-row-label">❤️ HP</span><span class="stat-row-values"><span class="stat-old">${currentStats.hp}</span>${!isMax ? `<span class="stat-arrow">➜</span><span class="stat-new">${nextStats.hp}</span>` : ''}</span></div>`;
+            if (currentStats.dmg > 0) statsHtml += `<div class="stat-row"><span class="stat-row-label">⚔️ Урон</span><span class="stat-row-values"><span class="stat-old">${currentStats.dmg}</span>${!isMax ? `<span class="stat-arrow">➜</span><span class="stat-new">${nextStats.dmg}</span>` : ''}</span></div>`;
+            statsHtml += `<div class="stat-row"><span class="stat-row-label">💧 Стоимость</span><span class="stat-row-values"><span class="stat-old">${card.cost}</span></span></div>`;
+            statsHtml += `<div class="stat-row"><span class="stat-row-label">🃏 Копий</span><span class="stat-row-values"><span class="stat-new">${progress.cards}</span></span></div>`;
+            if (card.isSpell) statsHtml += `<div class="stat-row"><span class="stat-row-label">✨ Тип</span><span class="stat-row-values"><span class="stat-new">Заклинание</span></span></div>`;
+            if (card.isBuilding) statsHtml += `<div class="stat-row"><span class="stat-row-label">🏗️ Тип</span><span class="stat-row-values"><span class="stat-new">Здание</span></span></div>`;
+            if (card.isFlying) statsHtml += `<div class="stat-row"><span class="stat-row-label">🦅 Тип</span><span class="stat-row-values"><span class="stat-new">Летающий</span></span></div>`;
+            if (card.isSplash) statsHtml += `<div class="stat-row"><span class="stat-row-label">💥 Атака</span><span class="stat-row-values"><span class="stat-new">По области</span></span></div>`;
+            if (card.targetsBuildingsOnly) statsHtml += `<div class="stat-row"><span class="stat-row-label">🎯 Цель</span><span class="stat-row-values"><span class="stat-new">Только здания</span></span></div>`;
+            document.getElementById('modalStats').innerHTML = statsHtml;
+
+            const reqCoins = isMax ? 0 : getUpgradeCoinCost(currentLevel, card.rarity), reqCards = isMax ? 0 : getUpgradeCardCost(currentLevel, card.rarity);
+            const coinReqEl = document.getElementById('modalCoinReq'), cardReqEl = document.getElementById('modalCardReq');
+            if (isMax) { coinReqEl.textContent = '—'; coinReqEl.className = 'req-value enough'; cardReqEl.textContent = '—'; cardReqEl.className = 'req-value enough'; }
+            else { coinReqEl.textContent = `${coins} / ${reqCoins}`; coinReqEl.className = 'req-value ' + (coins >= reqCoins ? 'enough' : 'not-enough'); cardReqEl.textContent = `${progress.cards} / ${reqCards}`; cardReqEl.className = 'req-value ' + (progress.cards >= reqCards ? 'enough' : 'not-enough'); }
+
+            const upgradeBtn = document.getElementById('modalUpgradeBtn');
+            if (isMax) { upgradeBtn.textContent = 'МАКС'; upgradeBtn.className = 'modal-btn modal-btn-upgrade max'; upgradeBtn.disabled = true; }
+            else { const can = coins >= reqCoins && progress.cards >= reqCards; upgradeBtn.textContent = 'УЛУЧШИТЬ'; upgradeBtn.className = 'modal-btn modal-btn-upgrade'; upgradeBtn.disabled = !can; }
+
+            const useBtn = document.getElementById('modalUseBtn');
+            if (inDeck) { useBtn.textContent = 'УБРАТЬ'; useBtn.className = 'modal-btn modal-btn-use in-deck'; useBtn.disabled = false; }
+            else { if (deck.length >= 8) { useBtn.textContent = 'ПОЛНА'; useBtn.className = 'modal-btn modal-btn-use'; useBtn.disabled = true; } else { useBtn.textContent = 'ИСПОЛЬЗОВАТЬ'; useBtn.className = 'modal-btn modal-btn-use'; useBtn.disabled = false; } }
+
+            document.getElementById('upgradeModal').classList.add('active');
+        }
+
+        function closeUpgradeModal() { document.getElementById('upgradeModal').classList.remove('active'); upgradeTargetCardId = null; }
+
+        function performUpgrade() {
+            if (!upgradeTargetCardId) return;
+            const cardId = upgradeTargetCardId, card = ALL_CARDS.find(c => c.id === cardId), progress = cardProgress[cardId];
+            if (!card || !progress || progress.level >= MAX_LEVEL) return;
+            const reqCoins = getUpgradeCoinCost(progress.level, card.rarity), reqCards = getUpgradeCardCost(progress.level, card.rarity);
+            if (coins < reqCoins || progress.cards < reqCards) { showToast('❌ Недостаточно ресурсов'); return; }
+            coins -= reqCoins; progress.cards -= reqCards; progress.level++;
+            saveGame();
+            showToast(`⭐ ${card.name} → УР. ${progress.level}!`); updateTopBar(); renderCollection(); openUpgradeModal(cardId);
+        }
+
+        function toggleCardInDeck() {
+            if (!upgradeTargetCardId) return;
+            const cardId = upgradeTargetCardId, card = ALL_CARDS.find(c => c.id === cardId), deck = getActiveDeck();
+            if (!card) return;
+            const idx = deck.indexOf(cardId);
+            if (idx >= 0) { deck.splice(idx, 1); showToast(`➖ ${card.name} убран`); }
+            else { if (deck.length >= 8) { showToast('❌ Колода заполнена'); return; } deck.push(cardId); showToast(`➕ ${card.name} добавлен`); }
+            saveGame();
+            renderCollection(); renderBattleLobby(); openUpgradeModal(cardId);
+        }
+
+        function initGameState() {
+            elixir = 10; enemyElixir = 5; units = []; projectiles = []; activeSpells = []; gameOver = false; selectedCardIndex = 0; enemyAITimer = 0; elixirRegenTimer = 0; enemyElixirRegenTimer = 0;
+            const playerIndices = [0, 1, 2, 3, 4, 5, 6, 7]; shuffleArray(playerIndices);
+            playerHand = playerIndices.slice(0, 4); playerQueue = playerIndices.slice(4);
+            enemyDeck = []; const poolCopy = [...UPGRADEABLE_CARDS]; shuffleArray(poolCopy);
+            for (let i = 0; i < 8; i++) enemyDeck.push(poolCopy[i].id);
+            const enemyIndices = [0, 1, 2, 3, 4, 5, 6, 7]; shuffleArray(enemyIndices);
+            enemyHand = enemyIndices.slice(0, 4); enemyQueue = enemyIndices.slice(4);
+            playerKing = { hp: 2400, maxHp: 2400, alive: true }; enemyKing = { hp: 2400, maxHp: 2400, alive: true };
+            playerLeftTower = { hp: 1400, maxHp: 1400, alive: true }; playerRightTower = { hp: 1400, maxHp: 1400, alive: true };
+            enemyLeftTower = { hp: 1400, maxHp: 1400, alive: true }; enemyRightTower = { hp: 1400, maxHp: 1400, alive: true };
+            towers = [
+                { obj: playerKing, pos: PLAYER_KING, team: 'player', isKing: true, radius: KING_TOWER_RADIUS, dmg: 90, range: 170, attackCooldown: 0, attackSpeed: 1.0, projectileSpeed: 500, projectileColor: '#3f7fb0' },
+                { obj: playerLeftTower, pos: PLAYER_LEFT_TOWER, team: 'player', isKing: false, radius: TOWER_RADIUS, dmg: 60, range: 150, attackCooldown: 0, attackSpeed: 1.0, projectileSpeed: 500, projectileColor: '#3f7fb0' },
+                { obj: playerRightTower, pos: PLAYER_RIGHT_TOWER, team: 'player', isKing: false, radius: TOWER_RADIUS, dmg: 60, range: 150, attackCooldown: 0, attackSpeed: 1.0, projectileSpeed: 500, projectileColor: '#3f7fb0' },
+                { obj: enemyKing, pos: ENEMY_KING, team: 'enemy', isKing: true, radius: KING_TOWER_RADIUS, dmg: 90, range: 170, attackCooldown: 0, attackSpeed: 1.0, projectileSpeed: 500, projectileColor: '#b03f3f' },
+                { obj: enemyLeftTower, pos: ENEMY_LEFT_TOWER, team: 'enemy', isKing: false, radius: TOWER_RADIUS, dmg: 60, range: 150, attackCooldown: 0, attackSpeed: 1.0, projectileSpeed: 500, projectileColor: '#b03f3f' },
+                { obj: enemyRightTower, pos: ENEMY_RIGHT_TOWER, team: 'enemy', isKing: false, radius: TOWER_RADIUS, dmg: 60, range: 150, attackCooldown: 0, attackSpeed: 1.0, projectileSpeed: 500, projectileColor: '#b03f3f' }
+            ];
+            updateTopBar(); updateElixirUI(); updateEnemyElixirUI(); renderBattleCards();
+            document.getElementById('battleLobbySection').classList.add('hidden');
+            document.getElementById('battleArenaSection').classList.remove('hidden');
+            battleActive = true;
+        }
+
+        function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
+        function renderBattleCards() {
+            const cardPanel = document.getElementById('cardPanel'), deck = getActiveDeck();
+            cardPanel.innerHTML = '';
+            playerHand.forEach((deckIdx, idx) => {
+                const cardId = deck[deckIdx], card = ALL_CARDS.find(c => c.id === cardId), progress = cardProgress[cardId];
+                if (!card) return;
+                const cardDiv = document.createElement('div');
+                const isDisabled = elixir < card.cost;
+                cardDiv.className = 'card' + (idx === selectedCardIndex ? ' selected' : '') + (isDisabled ? ' disabled' : '');
+                cardDiv.innerHTML = `<div class="lvl">${progress ? progress.level : '?'}</div><img class="emoji" src="${card.image}" alt="${card.name}"><div class="name">${card.name}</div><div class="cost">${card.cost}</div>`;
+                cardDiv.addEventListener('click', (e) => { e.stopPropagation(); if (!gameOver) { selectedCardIndex = idx; renderBattleCards(); } });
+                cardPanel.appendChild(cardDiv);
+            });
+            const nextCardIndicator = document.getElementById('nextCardIndicator');
+            if (playerQueue.length > 0) {
+                const nextDeckIdx = playerQueue[0], nextCardId = deck[nextDeckIdx], nextCard = ALL_CARDS.find(c => c.id === nextCardId);
+                if (nextCard) nextCardIndicator.innerHTML = `<img class="emoji" src="${nextCard.image}" alt="${nextCard.name}"><div class="cost">${nextCard.cost}</div>`;
+            } else nextCardIndicator.innerHTML = `<div class="emoji">?</div>`;
+        }
+
+        function updateElixirUI() { const fill = document.getElementById('elixirFill'), text = document.getElementById('elixirText'), percent = (elixir / MAX_ELIXIR) * 100; fill.style.width = percent + '%'; text.textContent = Math.floor(elixir * 10) / 10; }
+        function updateEnemyElixirUI() { const fill = document.getElementById('enemyElixirFill'), text = document.getElementById('enemyElixirText'), percent = (enemyElixir / MAX_ELIXIR) * 100; fill.style.width = percent + '%'; text.textContent = Math.floor(enemyElixir * 10) / 10; }
+        function cycleCardInHand(handIndex) { const used = playerHand[handIndex]; playerQueue.push(used); playerHand[handIndex] = playerQueue.shift(); renderBattleCards(); }
+        function cycleEnemyCardInHand(handIndex) { const used = enemyHand[handIndex]; enemyQueue.push(used); enemyHand[handIndex] = enemyQueue.shift(); }
+
+        // ============ ЗОНА РАЗМЕЩЕНИЯ (4 четверти) ============
+        function canPlaceAt(x, y, card) {
+            if (!card) return false;
+            if (card.isSpell) return true;
+            if (card.isTowerTroop) return true;
+
+            if (y >= RIVER_BOTTOM) return true;
+            if (y >= RIVER_TOP && y < RIVER_BOTTOM) {
+                const onLeftBridge = Math.abs(x - BRIDGE_LEFT_X) <= BRIDGE_WIDTH / 2;
+                const onRightBridge = Math.abs(x - BRIDGE_RIGHT_X) <= BRIDGE_WIDTH / 2;
+                return onLeftBridge || onRightBridge;
+            }
+            if (y < ENEMY_MID_Y) return false;
+
+            const distToKing = Math.hypot(x - ENEMY_KING.x, y - ENEMY_KING.y);
+            if (distToKing <= KING_SAFE_DIST) return false;
+
+            const enemyLeftDestroyed = enemyLeftTower && !enemyLeftTower.alive;
+            const enemyRightDestroyed = enemyRightTower && !enemyRightTower.alive;
+            if (enemyLeftDestroyed && x < ENEMY_MID_X) return true;
+            if (enemyRightDestroyed && x >= ENEMY_MID_X) return true;
+            return false;
+        }
+
+        function drawPlacementZone() {
+            ctx.save();
+            ctx.fillStyle = 'rgba(255, 40, 40, 0.22)';
+            const leftBridgeL = BRIDGE_LEFT_X - BRIDGE_WIDTH / 2;
+            const leftBridgeR = BRIDGE_LEFT_X + BRIDGE_WIDTH / 2;
+            const rightBridgeL = BRIDGE_RIGHT_X - BRIDGE_WIDTH / 2;
+            const rightBridgeR = BRIDGE_RIGHT_X + BRIDGE_WIDTH / 2;
+            ctx.fillRect(0, RIVER_TOP, leftBridgeL, RIVER_BOTTOM - RIVER_TOP);
+            if (leftBridgeR < rightBridgeL) ctx.fillRect(leftBridgeR, RIVER_TOP, rightBridgeL - leftBridgeR, RIVER_BOTTOM - RIVER_TOP);
+            ctx.fillRect(rightBridgeR, RIVER_TOP, W - rightBridgeR, RIVER_BOTTOM - RIVER_TOP);
+            ctx.fillRect(0, 0, W, ENEMY_MID_Y);
+
+            const enemyLeftDestroyed = enemyLeftTower && !enemyLeftTower.alive;
+            const enemyRightDestroyed = enemyRightTower && !enemyRightTower.alive;
+
+            if (!enemyLeftDestroyed) {
+                ctx.fillRect(0, ENEMY_MID_Y, ENEMY_MID_X, RIVER_TOP - ENEMY_MID_Y);
+            } else {
+                ctx.save(); ctx.beginPath(); ctx.rect(0, ENEMY_MID_Y, ENEMY_MID_X, RIVER_TOP - ENEMY_MID_Y); ctx.clip();
+                ctx.beginPath(); ctx.arc(ENEMY_KING.x, ENEMY_KING.y, KING_SAFE_DIST, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+            if (!enemyRightDestroyed) {
+                ctx.fillRect(ENEMY_MID_X, ENEMY_MID_Y, W - ENEMY_MID_X, RIVER_TOP - ENEMY_MID_Y);
+            } else {
+                ctx.save(); ctx.beginPath(); ctx.rect(ENEMY_MID_X, ENEMY_MID_Y, W - ENEMY_MID_X, RIVER_TOP - ENEMY_MID_Y); ctx.clip();
+                ctx.beginPath(); ctx.arc(ENEMY_KING.x, ENEMY_KING.y, KING_SAFE_DIST, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            }
+            ctx.restore();
+        }
+
+        function castSpell(team, card, x, y) {
+            const radius = card.range || 80, dmg = card.dmg, towerDmg = card.towerDamage || card.dmg * 0.4;
+            units.forEach(u => { if (!u.alive) return; const isEnemy = (team === 'player' && u.team === 'enemy') || (team === 'enemy' && u.team === 'player'); if (!isEnemy) return; if (Math.hypot(u.x - x, u.y - y) <= radius) { u.hp -= dmg; if (u.hp <= 0) u.alive = false; } });
+            towers.forEach(t => { if (!t.obj.alive) return; const isEnemy = (team === 'player' && t.team === 'enemy') || (team === 'enemy' && t.team === 'player'); if (!isEnemy) return; if (Math.hypot(t.pos.x - x, t.pos.y - y) <= radius + t.radius) { t.obj.hp -= towerDmg; if (t.obj.hp <= 0) { t.obj.hp = 0; t.obj.alive = false; } } });
+            activeSpells.push({ x, y, radius, color: card.color, life: 0.5, maxLife: 0.5 });
+            checkGameOver();
+        }
+
+        function spawnUnit(team, cardId, x, y, useLevel = true) {
+            const baseCard = ALL_CARDS.find(c => c.id === cardId);
+            if (!baseCard) return;
+            if (baseCard.isTowerTroop) return;
+
+            let stats;
+            if (useLevel && team === 'player') stats = getCardStatsWithLevel(cardId);
+            else stats = { ...baseCard, level: RARITY_MIN_LEVEL[baseCard.rarity] };
+
+            const bridgeX = x < W / 2 ? BRIDGE_LEFT_X : BRIDGE_RIGHT_X;
+            const count = stats.isSwarm ? (stats.id === 'skeleton_army' ? 14 : stats.id === 'bats' ? 5 : stats.id === 'minion_horde' ? 6 : stats.id === 'barbarians' ? 4 : stats.id === 'royal_recruits' ? 6 : stats.id === 'guards' ? 3 : stats.id === 'royal_hogs' ? 4 : stats.id === 'wall_breakers' ? 2 : stats.id === 'elite_barbarians' ? 2 : stats.id === 'zappies' ? 3 : stats.id === 'goblin_gang' ? 3 : stats.id === 'three_musketeers' ? 3 : stats.id === 'minion' ? 3 : stats.id === 'goblins' ? 3 : stats.id === 'spear_goblins' ? 3 : stats.id === 'skeletons' ? 3 : stats.id === 'skeleton_dragons' ? 2 : 1) : 1;
+
+            for (let i = 0; i < count; i++) {
+                const offsetX = count > 1 ? (Math.random() - 0.5) * 40 : 0;
+                const offsetY = count > 1 ? (Math.random() - 0.5) * 40 : 0;
+                units.push({
+                    cardId: stats.id, team, type: stats.name, emoji: stats.emoji,
+                    hp: stats.hp, maxHp: stats.hp, dmg: stats.dmg,
+                    speed: stats.speed, range: stats.range, color: stats.color, size: stats.size,
+                    isRanged: stats.isRanged, isFlying: !!stats.isFlying, isSplash: !!stats.isSplash,
+                    canTargetAir: !!stats.canTargetAir, projectileSpeed: stats.projectileSpeed || 400,
+                    projectileColor: stats.projectileColor || '#ffffff',
+                    targetsBuildingsOnly: !!stats.targetsBuildingsOnly,
+                    x: x + offsetX, y: y + offsetY, attackCooldown: 0, attackSpeed: 1.0,
+                    radius: stats.size * 0.7, alive: true, isBuilding: stats.isBuilding || false,
+                    isSpawner: stats.isSpawner || false, bridgeX: bridgeX
+                });
+            }
+        }
+
+        function findTargetForUnit(unit) {
+            const enemyTeam = unit.team === 'player' ? 'enemy' : 'player';
+            let closest = null, minDist = Infinity;
+            // Если юнит атакует только здания — пропускаем поиск вражеских юнитов
+            if (!unit.targetsBuildingsOnly) {
+                for (let u of units) {
+                    if (u.team !== enemyTeam || !u.alive || u.isBuilding) continue;
+                    if (u.isFlying && !unit.canTargetAir) continue;
+                    const dist = Math.hypot(u.x - unit.x, u.y - unit.y);
+                    if (dist < minDist) { minDist = dist; closest = { type: 'unit', unit: u }; }
+                }
+            }
+            for (let t of towers) {
+                if (t.team !== enemyTeam || !t.obj.alive) continue;
+                const dist = Math.hypot(t.pos.x - unit.x, t.pos.y - unit.y);
+                if (dist < minDist) { minDist = dist; closest = { type: 'tower', tower: t }; }
+            }
+            return closest;
+        }
+
+        function getTargetCoords(targetInfo) {
+            if (targetInfo.type === 'unit') return { x: targetInfo.unit.x, y: targetInfo.unit.y, radius: targetInfo.unit.radius };
+            return { x: targetInfo.tower.pos.x, y: targetInfo.tower.pos.y, radius: targetInfo.tower.radius };
+        }
+
+        function getMoveWaypoint(unit, targetX, targetY) {
+            if (unit.isFlying) return { x: targetX, y: targetY };
+            const bridgeX = unit.bridgeX;
+            const inRiverZone = unit.y >= RIVER_TOP && unit.y <= RIVER_BOTTOM;
+            if (inRiverZone) {
+                const targetOnTop = targetY < RIVER_Y;
+                if (targetOnTop) return { x: bridgeX, y: RIVER_TOP - 5 };
+                return { x: bridgeX, y: RIVER_BOTTOM + 5 };
+            }
+            const unitOnTop = unit.y < RIVER_TOP, targetOnTop = targetY < RIVER_TOP;
+            if (unitOnTop === targetOnTop) return { x: targetX, y: targetY };
+            if (Math.abs(unit.x - bridgeX) > 3) return { x: bridgeX, y: unit.y };
+            if (unitOnTop) return { x: bridgeX, y: RIVER_TOP + 2 };
+            return { x: bridgeX, y: RIVER_BOTTOM - 2 };
+        }
+
+        function moveUnit(unit, dt, targetInfo) {
+            if (!targetInfo || unit.isBuilding) return;
+            const tc = getTargetCoords(targetInfo);
+            const distToTarget = Math.hypot(tc.x - unit.x, tc.y - unit.y);
+            if (distToTarget <= unit.range + tc.radius) return;
+
+            const wp = getMoveWaypoint(unit, tc.x, tc.y);
+            const dx = wp.x - unit.x, dy = wp.y - unit.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < 1) return;
+
+            const moveSpeed = unit.speed * 60 * dt;
+            const step = Math.min(moveSpeed, dist);
+            unit.x += (dx / dist) * step; unit.y += (dy / dist) * step;
+            unit.x = Math.max(20, Math.min(W - 20, unit.x));
+            unit.y = Math.max(20, Math.min(H - 20, unit.y));
+
+            if (!unit.isFlying && unit.y > RIVER_TOP && unit.y < RIVER_BOTTOM) {
+                const onLeftBridge = Math.abs(unit.x - BRIDGE_LEFT_X) <= BRIDGE_WIDTH / 2 + 2;
+                const onRightBridge = Math.abs(unit.x - BRIDGE_RIGHT_X) <= BRIDGE_WIDTH / 2 + 2;
+                if (!onLeftBridge && !onRightBridge) unit.x = unit.bridgeX;
+            }
+        }
+
+        function createProjectile(from, toTarget, dmg, speed, color, team, size) {
+            const dx = toTarget.x - from.x, dy = toTarget.y - from.y, dist = Math.hypot(dx, dy) || 1;
+            projectiles.push({ x: from.x, y: from.y, vx: (dx / dist) * speed, vy: (dy / dist) * speed, target: toTarget, targetX: toTarget.x, targetY: toTarget.y, dmg, color, team, size: size || 4, life: 3.0, radius: size || 4 });
+        }
+
+        function dealDamage(attacker, targetInfo, baseDmg) {
+            if (targetInfo.type === 'unit') {
+                const primary = targetInfo.unit;
+                primary.hp -= baseDmg;
+                if (primary.hp <= 0) primary.alive = false;
+                if (attacker.isSplash) {
+                    const cx = primary.x, cy = primary.y;
+                    const enemyTeam = attacker.team === 'player' ? 'enemy' : 'player';
+                    for (let u of units) {
+                        if (!u.alive || u === primary) continue;
+                        if (u.team !== enemyTeam) continue;
+                        if (u.isFlying && !attacker.canTargetAir) continue;
+                        if (Math.hypot(u.x - cx, u.y - cy) <= SPLASH_RADIUS) { u.hp -= baseDmg; if (u.hp <= 0) u.alive = false; }
+                    }
+                }
+            } else {
+                targetInfo.tower.obj.hp -= baseDmg;
+                if (targetInfo.tower.obj.hp <= 0) { targetInfo.tower.obj.hp = 0; targetInfo.tower.obj.alive = false; }
+            }
+        }
+
+        function attackIfPossible(unit, dt, targetInfo) {
+            if (!targetInfo || unit.isBuilding) return;
+            if (unit.attackCooldown > 0) { unit.attackCooldown -= dt; return; }
+            const tc = getTargetCoords(targetInfo), dist = Math.hypot(tc.x - unit.x, tc.y - unit.y);
+            if (dist <= unit.range + tc.radius) {
+                if (unit.isRanged && unit.range > 50) {
+                    let targetObj;
+                    if (targetInfo.type === 'unit') targetObj = { isUnit: true, unit: targetInfo.unit, x: targetInfo.unit.x, y: targetInfo.unit.y };
+                    else targetObj = { isUnit: false, tower: targetInfo.tower, x: targetInfo.tower.pos.x, y: targetInfo.tower.pos.y };
+                    createProjectile({ x: unit.x, y: unit.y }, targetObj, unit.dmg, unit.projectileSpeed, unit.projectileColor, unit.team, Math.max(3, unit.size * 0.25));
+                    if (unit.isSplash) {
+                        setTimeout(() => {
+                            if (gameOver) return;
+                            if (targetInfo.type === 'unit' && targetObj.unit && targetObj.unit.alive) {
+                                const enemyTeam = unit.team === 'player' ? 'enemy' : 'player';
+                                const cx = targetObj.unit.x, cy = targetObj.unit.y;
+                                for (let u of units) {
+                                    if (!u.alive || u === targetObj.unit) continue;
+                                    if (u.team !== enemyTeam) continue;
+                                    if (u.isFlying && !unit.canTargetAir) continue;
+                                    if (Math.hypot(u.x - cx, u.y - cy) <= SPLASH_RADIUS) { u.hp -= unit.dmg; if (u.hp <= 0) u.alive = false; }
+                                }
+                            }
+                        }, 200);
+                    }
+                } else { dealDamage(unit, targetInfo, unit.dmg); }
+                unit.attackCooldown = 1 / unit.attackSpeed;
+            }
+        }
+
+        function updateProjectiles(dt) {
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                const p = projectiles[i]; p.life -= dt;
+                if (p.target && p.target.isUnit && p.target.unit && p.target.unit.alive) { p.targetX = p.target.unit.x; p.targetY = p.target.unit.y; }
+                else if (p.target && !p.target.isUnit && p.target.tower && p.target.tower.obj.alive) { p.targetX = p.target.tower.pos.x; p.targetY = p.target.tower.pos.y; }
+                else { if (p.life <= 0) projectiles.splice(i, 1); continue; }
+                const dx = p.targetX - p.x, dy = p.targetY - p.y, dist = Math.hypot(dx, dy);
+                if (dist < 8) {
+                    if (p.target.isUnit && p.target.unit && p.target.unit.alive) { p.target.unit.hp -= p.dmg; if (p.target.unit.hp <= 0) p.target.unit.alive = false; }
+                    else if (!p.target.isUnit && p.target.tower && p.target.tower.obj.alive) { p.target.tower.obj.hp -= p.dmg; if (p.target.tower.obj.hp <= 0) { p.target.tower.obj.hp = 0; p.target.tower.obj.alive = false; } }
+                    projectiles.splice(i, 1); continue;
+                }
+                const moveSpeed = Math.hypot(p.vx, p.vy);
+                p.x += (dx / dist) * moveSpeed * dt; p.y += (dy / dist) * moveSpeed * dt;
+                if (p.life <= 0) projectiles.splice(i, 1);
+            }
+        }
+
+        function updateTowers(dt) {
+            towers.forEach(t => {
+                if (!t.obj.alive) return;
+                if (t.attackCooldown > 0) t.attackCooldown -= dt;
+                const enemyTeam = t.team === 'player' ? 'enemy' : 'player';
+                let target = null, minDist = Infinity;
+                for (let u of units) {
+                    if (u.team !== enemyTeam || !u.alive || u.isBuilding) continue;
+                    const dist = Math.hypot(u.x - t.pos.x, u.y - t.pos.y);
+                    if (dist <= t.range && dist < minDist) { minDist = dist; target = u; }
+                }
+                if (target && t.attackCooldown <= 0) { createProjectile({ x: t.pos.x, y: t.pos.y }, { isUnit: true, unit: target, x: target.x, y: target.y }, t.dmg, t.projectileSpeed, t.projectileColor, t.team, 5); t.attackCooldown = 1 / t.attackSpeed; }
+            });
+        }
+
+        function updateUnits(dt) {
+            if (gameOver) return;
+            units = units.filter(u => u.alive && u.hp > 0);
+            for (let unit of units) {
+                if (!unit.alive) continue;
+                const targetInfo = findTargetForUnit(unit);
+                if (targetInfo) { moveUnit(unit, dt, targetInfo); attackIfPossible(unit, dt, targetInfo); }
+                if (unit.attackCooldown > 0) unit.attackCooldown -= dt;
+            }
+            updateProjectiles(dt); updateTowers(dt); checkGameOver();
+        }
+
+        function checkGameOver() {
+            if (gameOver) return;
+            if (!enemyKing.alive) {
+                gameOver = true;
+                trophies += 30; coins += 100;
+                updateTopBar();
+                const crownsResult = addCrownsForVictory();
+                const result = addChestForVictory();
+                let toastMsg = `🏆 ПОБЕДА! +30🏆 +100🪙`;
+                if (crownsResult.earnedCrowns > 0) toastMsg += ` +${crownsResult.earnedCrowns}👑`;
+                if (result) toastMsg += ` +🎁`;
+                showToast(toastMsg);
+                if (crownsResult.leveledUp) setTimeout(() => { showToast(`👑 Royale Pass: Уровень ${crownsResult.newLevel}!`); }, 1500);
+                saveGame(); renderChests(); renderRoyalPass();
+                setTimeout(() => { battleActive = false; renderBattleLobby(); }, 2400);
+            } else if (!playerKing.alive) {
+                gameOver = true;
+                trophies = Math.max(0, trophies - 20);
+                coins += 30;
+                updateTopBar();
+                showToast('💀 ПОРАЖЕНИЕ... -20🏆 +30🪙');
+                saveGame();
+                setTimeout(() => { battleActive = false; renderBattleLobby(); }, 2200);
+            }
+        }
+
+        function updateAI(dt) {
+            if (gameOver) return;
+            enemyAITimer += dt;
+            if (enemyAITimer >= 1.2) {
+                enemyAITimer = 0;
+                const affordable = [];
+                for (let i = 0; i < enemyHand.length; i++) { const deckIdx = enemyHand[i], cardId = enemyDeck[deckIdx], card = ALL_CARDS.find(c => c.id === cardId); if (card && card.cost <= enemyElixir) affordable.push({ handIndex: i, card }); }
+                if (affordable.length > 0 && units.filter(u => u.team === 'enemy').length < 6) {
+                    affordable.sort((a, b) => b.card.cost - a.card.cost);
+                    let chosen = Math.random() < 0.7 ? affordable[0] : affordable[Math.floor(Math.random() * affordable.length)];
+                    const spawnX = 60 + Math.random() * 280, spawnY = 60 + Math.random() * 140;
+                    if (chosen.card.isSpell) castSpell('enemy', chosen.card, spawnX, 400 + Math.random() * 150);
+                    else spawnUnit('enemy', chosen.card.id, spawnX, spawnY, false);
+                    enemyElixir -= chosen.card.cost; updateEnemyElixirUI(); cycleEnemyCardInHand(chosen.handIndex);
+                }
+            }
+        }
+
+        function drawUnitImage(u) {
+            const img = imageCache[u.cardId];
+            const size = u.size * 2.4;
+            ctx.save(); ctx.globalAlpha = 0.35; ctx.fillStyle = 'black';
+            ctx.beginPath(); ctx.ellipse(u.x, u.y + u.size * 0.85, u.size * 0.85, u.size * 0.35, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+            ctx.beginPath(); ctx.arc(u.x, u.y, u.size * 1.1, 0, Math.PI * 2);
+            ctx.fillStyle = u.team === 'player' ? 'rgba(74,143,201,0.65)' : 'rgba(201,74,74,0.65)'; ctx.fill();
+            ctx.strokeStyle = u.team === 'player' ? '#a8e0ff' : '#ffb0b0'; ctx.lineWidth = 2; ctx.stroke();
+            if (img && img.complete && img.naturalWidth > 0) { ctx.save(); ctx.drawImage(img, u.x - size / 2, u.y - size / 2, size, size); ctx.restore(); }
+            else { ctx.font = `${u.size * 1.2}px sans-serif`; ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(u.emoji, u.x, u.y); }
+            const hpPercent = u.hp / u.maxHp;
+            ctx.fillStyle = '#111'; ctx.fillRect(u.x - 18, u.y - u.size - 12, 36, 5);
+            ctx.fillStyle = u.team === 'player' ? '#2ecc71' : '#e67e22'; ctx.fillRect(u.x - 18, u.y - u.size - 12, 36 * hpPercent, 5);
+            ctx.strokeStyle = '#000'; ctx.lineWidth = 1; ctx.strokeRect(u.x - 18, u.y - u.size - 12, 36, 5);
+        }
+
+        function draw() {
+            const arena = getCurrentArena();
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = arena.color2; ctx.fillRect(0, RIVER_Y + 20, W, H - RIVER_Y);
+            ctx.fillStyle = arena.color1; ctx.fillRect(0, 0, W, RIVER_Y - 20);
+            ctx.fillStyle = arena.river; ctx.fillRect(0, RIVER_Y - 20, W, 40);
+            for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.ellipse(50 + i * 70, RIVER_Y + Math.sin(Date.now() / 300 + i) * 6, 30, 6, 0, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.fill(); }
+            ctx.fillStyle = arena.bridge; ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 8;
+            ctx.fillRect(BRIDGE_LEFT_X - BRIDGE_WIDTH / 2, RIVER_Y - 22, BRIDGE_WIDTH, 44);
+            ctx.fillRect(BRIDGE_RIGHT_X - BRIDGE_WIDTH / 2, RIVER_Y - 22, BRIDGE_WIDTH, 44);
+            ctx.shadowBlur = 0;
+
+            towers.forEach(t => {
+                if (!t.obj.alive) return;
+                const x = t.pos.x, y = t.pos.y, r = t.radius;
+                ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(0,0,0,0.7)';
+                ctx.fillStyle = t.team === 'player' ? '#3f7fb0' : '#b03f3f';
+                ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#f0e6d2'; ctx.lineWidth = 3; ctx.stroke();
+                if (t.isKing) { ctx.font = '28px sans-serif'; ctx.fillStyle = '#ffd966'; ctx.shadowBlur = 10; ctx.fillText('👑', x - 16, y - 12); }
+                const hpPercent = t.obj.hp / t.obj.maxHp;
+                ctx.shadowBlur = 0; ctx.fillStyle = '#111'; ctx.fillRect(x - 28, y - r - 12, 56, 8);
+                ctx.fillStyle = t.team === 'player' ? '#2ecc71' : '#e74c3c'; ctx.fillRect(x - 28, y - r - 12, 56 * hpPercent, 8);
+                ctx.strokeStyle = '#aaa'; ctx.lineWidth = 1; ctx.strokeRect(x - 28, y - r - 12, 56, 8);
+            });
+
+            const groundUnits = units.filter(u => u.alive && !u.isFlying);
+            const flyingUnits = units.filter(u => u.alive && u.isFlying);
+            groundUnits.forEach(u => drawUnitImage(u));
+            flyingUnits.forEach(u => {
+                ctx.save(); ctx.globalAlpha = 0.25; ctx.fillStyle = 'black';
+                ctx.beginPath(); ctx.ellipse(u.x, u.y + u.size * 1.4, u.size * 0.7, u.size * 0.28, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                ctx.save(); ctx.translate(0, -6); drawUnitImage({ ...u, y: u.y }); ctx.restore();
+            });
+
+            projectiles.forEach(p => { ctx.shadowBlur = 12; ctx.shadowColor = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke(); });
+            ctx.shadowBlur = 0;
+            activeSpells.forEach(s => { const alpha = s.life / s.maxLife; ctx.globalAlpha = alpha * 0.5; ctx.beginPath(); ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2); ctx.fillStyle = s.color; ctx.fill(); ctx.globalAlpha = alpha; ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); ctx.globalAlpha = 1; });
+
+            if (!gameOver && battleActive && playerHand.length > 0) {
+                const deck = getActiveDeck();
+                const deckIdx = playerHand[selectedCardIndex];
+                if (deckIdx !== undefined) {
+                    const cardId = deck[deckIdx], card = ALL_CARDS.find(c => c.id === cardId);
+                    if (card && !card.isSpell && !card.isTowerTroop) drawPlacementZone();
+                }
+            }
+            ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+        }
+
+        function gameLoop(now) {
+            if (!lastTimestamp) lastTimestamp = now;
+            let dt = (now - lastTimestamp) / 1000; if (dt > 0.1) dt = 0.1; lastTimestamp = now;
+            if (battleActive) {
+                if (!gameOver) {
+                    elixirRegenTimer += dt;
+                    while (elixirRegenTimer >= ELIXIR_REGEN_INTERVAL) { elixirRegenTimer -= ELIXIR_REGEN_INTERVAL; if (elixir < MAX_ELIXIR) { elixir = Math.min(MAX_ELIXIR, elixir + 1); updateElixirUI(); renderBattleCards(); } }
+                    enemyElixirRegenTimer += dt;
+                    while (enemyElixirRegenTimer >= ELIXIR_REGEN_INTERVAL) { enemyElixirRegenTimer -= ELIXIR_REGEN_INTERVAL; if (enemyElixir < MAX_ELIXIR) { enemyElixir = Math.min(MAX_ELIXIR, enemyElixir + 1); updateEnemyElixirUI(); } }
+                    updateUnits(dt); updateAI(dt);
+                    activeSpells = activeSpells.filter(s => { s.life -= dt; return s.life > 0; });
+                }
+                draw();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        // ============ ОБРАБОТКА КЛИКОВ / ТАЧЕЙ ============
+        function handleCanvasAction(clientX, clientY) {
+            if (gameOver || !battleActive) return;
+            if (playerHand.length === 0) return;
+            const rect = canvas.getBoundingClientRect(), scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height;
+            const mouseX = (clientX - rect.left) * scaleX, mouseY = (clientY - rect.top) * scaleY;
+            const deck = getActiveDeck(), deckIdx = playerHand[selectedCardIndex], cardId = deck[deckIdx], card = ALL_CARDS.find(c => c.id === cardId);
+            if (!card) return;
+
+            if (!canPlaceAt(mouseX, mouseY, card)) { showToast('❌ Нельзя разместить здесь'); return; }
+            if (elixir < card.cost) { const et = document.getElementById('elixirText'); et.style.color = '#e74c3c'; setTimeout(() => et.style.color = '#e8b3ff', 200); return; }
+            if (card.isSpell) { const spellWithLevel = getCardStatsWithLevel(cardId); castSpell('player', spellWithLevel, mouseX, mouseY); }
+            else if (card.isTowerTroop) { /* Башни-войска уже на поле */ }
+            else spawnUnit('player', cardId, mouseX, mouseY, true);
+            elixir -= card.cost; updateElixirUI(); cycleCardInHand(selectedCardIndex); renderBattleCards();
+        }
+
+        canvas.addEventListener('click', (e) => { handleCanvasAction(e.clientX, e.clientY); });
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            handleCanvasAction(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        document.getElementById('battleBtn').addEventListener('click', () => { if (getActiveDeck().length !== 8) return; initGameState(); lastTimestamp = 0; });
+        document.getElementById('forfeitBtn').addEventListener('click', () => { if (!battleActive || gameOver) return; gameOver = true; trophies = Math.max(0, trophies - 20); updateTopBar(); showToast('🏳️ Сдача... -20🏆'); saveGame(); setTimeout(() => { battleActive = false; renderBattleLobby(); }, 1500); });
+
+        document.getElementById('arenaCenterBtn').addEventListener('click', openGloryModal);
+        document.getElementById('gloryCloseBtn').addEventListener('click', closeGloryModal);
+        document.getElementById('gloryModal').addEventListener('click', (e) => { if (e.target.id === 'gloryModal') closeGloryModal(); });
+
+        document.getElementById('royalPassCard').addEventListener('click', openRoyalPassModal);
+        document.getElementById('rpCloseBtn').addEventListener('click', closeRoyalPassModal);
+        document.getElementById('royalPassModal').addEventListener('click', (e) => { if (e.target.id === 'royalPassModal') closeRoyalPassModal(); });
+
+        document.getElementById('copyDeckBtn').addEventListener('click', () => { const deck = getActiveDeck(); if (deck.length === 0) { showToast('❌ Колода пуста'); return; } clipboardDeck = [...deck]; showToast(`📋 Колода ${activeDeckIndex + 1} скопирована`); });
+        document.getElementById('pasteDeckBtn').addEventListener('click', () => { if (!clipboardDeck || clipboardDeck.length === 0) { showToast('❌ Буфер пуст'); return; } setActiveDeck([...clipboardDeck]); saveGame(); showToast(`📥 Вставлено`); renderCollection(); renderBattleLobby(); });
+        document.getElementById('clearDeckBtn').addEventListener('click', () => { const deck = getActiveDeck(); if (deck.length === 0) { showToast('❌ Уже пуста'); return; } setActiveDeck([]); saveGame(); showToast(`🗑️ Очищено`); renderCollection(); renderBattleLobby(); });
+
+        document.querySelectorAll('[data-pack]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const packType = this.dataset.pack;
+                let cost, maxCopies, packName;
+                if (packType === 'small') { cost = 100; maxCopies = 30; packName = 'Малый набор'; }
+                else if (packType === 'medium') { cost = 250; maxCopies = 60; packName = 'Средний набор'; }
+                else if (packType === 'large') { cost = 500; maxCopies = 100; packName = 'Большой набор'; }
+                else return;
+                if (coins < cost) { showToast('❌ Недостаточно монет'); return; }
+                coins -= cost;
+                const pool = [...UPGRADEABLE_CARDS]; shuffleArray(pool);
+                const chosen = pool.slice(0, 12);
+                let totalCopies = 0;
+                chosen.forEach(card => { const copies = 1 + Math.floor(Math.random() * maxCopies); cardProgress[card.id].cards += copies; totalCopies += copies; });
+                saveGame(); updateTopBar(); renderCollection();
+                showToast(`🃏 ${packName}: +${totalCopies} копий!`);
+            });
+        });
+
+        document.getElementById('buyFreeBtn').addEventListener('click', startAd);
+        document.getElementById('adSkipBtn').addEventListener('click', claimAdReward);
+        document.getElementById('adModal').addEventListener('click', (e) => { if (e.target.id === 'adModal') closeAdModal(); });
+
+        document.getElementById('modalCancelBtn').addEventListener('click', closeUpgradeModal);
+        document.getElementById('modalUpgradeBtn').addEventListener('click', performUpgrade);
+        document.getElementById('modalUseBtn').addEventListener('click', toggleCardInDeck);
+        document.getElementById('upgradeModal').addEventListener('click', (e) => { if (e.target.id === 'upgradeModal') closeUpgradeModal(); });
+        document.getElementById('chestOpenBtn').addEventListener('click', openChest);
+        document.getElementById('chestModal').addEventListener('click', (e) => { if (e.target.id === 'chestModal') closeChestModal(); });
+
+        // ============ АВТОРИЗАЦИЯ ============
+        let authMode = 'login';
+
+        function showAuthError(msg) { document.getElementById('authError').textContent = msg; }
+
+        function enterGame(nickname) {
+            currentUser = nickname;
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('appContainer').style.display = 'flex';
+            const loaded = loadGame();
+            initRoyalPassRewards(); initDecks(); initCardProgress(); preloadCardImages();
+            updateTopBar(); renderRoyalPass(); renderCollection(); renderBattleLobby(); updateAdButton();
+            if (loaded) showToast(`💾 Добро пожаловать, ${nickname}!`);
+            else showToast(`👑 Аккаунт создан!`);
+            lastTimestamp = 0;
+            requestAnimationFrame(gameLoop);
+        }
+
+        document.getElementById('authLoginBtn').addEventListener('click', () => {
+            const nick = document.getElementById('authNickname').value.trim();
+            const pwd = document.getElementById('authPassword').value;
+            if (!nick || nick.length < 2) { showAuthError('Никнейм минимум 2 символа'); return; }
+            if (!pwd || pwd.length < 3) { showAuthError('Пароль минимум 3 символа'); return; }
+            const accounts = getAccounts();
+            if (!accounts[nick]) { showAuthError('Аккаунт не найден. Создай новый!'); return; }
+            if (accounts[nick].password !== hashPassword(pwd)) { showAuthError('Неверный пароль'); return; }
+            enterGame(nick);
+        });
+
+        document.getElementById('authRegisterBtn').addEventListener('click', () => {
+            const nick = document.getElementById('authNickname').value.trim();
+            const pwd = document.getElementById('authPassword').value;
+            if (!nick || nick.length < 2) { showAuthError('Никнейм минимум 2 символа'); return; }
+            if (!pwd || pwd.length < 3) { showAuthError('Пароль минимум 3 символа'); return; }
+            const accounts = getAccounts();
+            if (accounts[nick]) { showAuthError('Никнейм уже занят'); return; }
+            accounts[nick] = { password: hashPassword(pwd), save: null };
+            saveAccounts(accounts);
+            enterGame(nick);
+        });
+
+        document.getElementById('authSwitchLink').addEventListener('click', () => {
+            authMode = authMode === 'login' ? 'register' : 'login';
+            document.getElementById('authSubtitle').textContent = authMode === 'login' ? 'Войди в свой аккаунт' : 'Создай новый аккаунт';
+            document.getElementById('authLoginBtn').style.display = authMode === 'login' ? 'block' : 'none';
+            document.getElementById('authRegisterBtn').style.display = authMode === 'register' ? 'block' : 'none';
+            document.getElementById('authSwitchText').innerHTML = authMode === 'login'
+                ? 'Нет аккаунта? <span id="authSwitchLink">Зарегистрироваться</span>'
+                : 'Уже есть аккаунт? <span id="authSwitchLink">Войти</span>';
+            document.getElementById('authSwitchLink').addEventListener('click', arguments.callee);
+            showAuthError('');
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            saveGame();
+            currentUser = null;
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('authNickname').value = '';
+            document.getElementById('authPassword').value = '';
+            showAuthError('');
+        });
+
+        // Стартовое состояние — экран входа
+        document.getElementById('authScreen').classList.remove('hidden');
+    })();
+</script>
+</body>
+</html>
